@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:turkish-llm-morphology:schema:dataset:v1",
+  "title": "Morphological experiment sample",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "sample_id",
+    "prefix",
+    "target",
+    "lemma",
+    "pos",
+    "morphological_features",
+    "affix_count",
+    "morphological_analyses",
+    "selected_analysis_index",
+    "scope"
+  ],
+  "properties": {
+    "sample_id": {"type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+    "prefix": {"type": "string"},
+    "target": {"type": "string", "minLength": 1},
+    "lemma": {"type": "string", "minLength": 1},
+    "pos": {"$ref": "#/$defs/pos"},
+    "morphological_features": {"$ref": "#/$defs/features"},
+    "affix_count": {"type": "integer", "minimum": 0},
+    "morphological_analyses": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/analysis"}
+    },
+    "selected_analysis_index": {"type": "integer", "minimum": 0},
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "experiment_type",
+        "has_derivation",
+        "has_copula",
+        "has_clitic",
+        "is_multiword_target"
+      ],
+      "properties": {
+        "experiment_type": {"enum": ["simple_verb_inflection", "noun_case"]},
+        "has_derivation": {"const": false},
+        "has_copula": {"const": false},
+        "has_clitic": {"const": false},
+        "is_multiword_target": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "pos": {
+      "enum": ["ADJ", "ADP", "ADV", "AUX", "CCONJ", "DET", "INTJ", "NOUN", "NUM", "PART", "PRON", "PROPN", "PUNCT", "SCONJ", "SYM", "VERB", "X"]
+    },
+    "features": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tense", "mood", "polarity", "person", "number", "case"],
+      "properties": {
+        "tense": {"enum": [null, "past", "present", "progressive", "aorist", "future", "evidential"]},
+        "mood": {"enum": [null, "indicative", "imperative", "conditional", "necessitative", "optative"]},
+        "polarity": {"enum": [null, "positive", "negative"]},
+        "person": {"enum": [null, "first", "second", "third"]},
+        "number": {"enum": [null, "singular", "plural"]},
+        "case": {"enum": [null, "nominative", "accusative", "dative", "locative", "ablative", "genitive", "instrumental", "equative"]}
+      }
+    },
+    "affix": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["surface", "label", "type"],
+      "properties": {
+        "surface": {"type": "string", "minLength": 1},
+        "label": {"type": "string", "minLength": 1},
+        "type": {"enum": ["derivational", "inflectional"]}
+      }
+    },
+    "analysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lemma", "pos", "morphological_features", "affixes"],
+      "properties": {
+        "lemma": {"type": "string", "minLength": 1},
+        "pos": {"$ref": "#/$defs/pos"},
+        "morphological_features": {"$ref": "#/$defs/features"},
+        "affixes": {"type": "array", "items": {"$ref": "#/$defs/affix"}}
+      }
+    }
+  }
+}
