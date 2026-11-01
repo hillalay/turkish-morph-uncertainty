@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:turkish-llm-morphology:schema:model-result:v2",
+  "title": "Model evaluation result v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id", "sample_id", "model_id", "model_revision", "evaluation_config_id",
+    "measurement_policy", "tokenization_config", "status", "token_count",
+    "token_logprobs", "word_nll", "token_normalized_nll", "alignment", "error"
+  ],
+  "properties": {
+    "schema_id": {"const": "urn:turkish-llm-morphology:schema:model-result:v2"},
+    "sample_id": {"type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+    "model_id": {"type": "string", "minLength": 1},
+    "model_revision": {"type": "string", "minLength": 1},
+    "evaluation_config_id": {"type": "string", "pattern": "^leading_space_in_target_v1:sha256:[a-f0-9]{64}$"},
+    "measurement_policy": {"const": "leading_space_in_target_v1"},
+    "tokenization_config": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tokenizer_id", "tokenizer_revision", "transformers_version", "tokenizers_version",
+        "use_fast", "add_special_tokens", "padding", "truncation",
+        "skip_special_tokens", "clean_up_tokenization_spaces"
+      ],
+      "properties": {
+        "tokenizer_id": {"type": "string", "minLength": 1},
+        "tokenizer_revision": {"type": "string", "minLength": 1},
+        "transformers_version": {"type": "string", "minLength": 1},
+        "tokenizers_version": {"type": "string", "minLength": 1},
+        "use_fast": {"const": true},
+        "add_special_tokens": {"const": false},
+        "padding": {"const": false},
+        "truncation": {"const": false},
+        "skip_special_tokens": {"const": false},
+        "clean_up_tokenization_spaces": {"const": false}
+      }
+    },
+    "status": {"enum": ["ok", "alignment_error"]},
+    "token_count": {"type": ["integer", "null"], "minimum": 1},
+    "token_logprobs": {"type": ["array", "null"], "minItems": 1, "items": {"type": "number"}},
+    "word_nll": {"type": ["number", "null"], "minimum": 0},
+    "token_normalized_nll": {"type": ["number", "null"], "minimum": 0},
+    "alignment": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "linguistic_target_char_span", "measured_target_char_span",
+        "target_token_indices", "target_token_char_spans"
+      ],
+      "properties": {
+        "linguistic_target_char_span": {"$ref": "#/$defs/span"},
+        "measured_target_char_span": {"$ref": "#/$defs/span"},
+        "target_token_indices": {"type": "array", "minItems": 1, "items": {"type": "integer", "minimum": 1}},
+        "target_token_char_spans": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/span"}}
+      }
+    },
+    "error": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["code", "message"],
+      "properties": {
+        "code": {"const": "TARGET_ALIGNMENT_FAILED"},
+        "message": {"type": "string", "minLength": 1}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "status": {"const": "ok"},
+        "token_count": {"type": "integer", "minimum": 1},
+        "token_logprobs": {"type": "array", "minItems": 1},
+        "word_nll": {"type": "number", "minimum": 0},
+        "token_normalized_nll": {"type": "number", "minimum": 0},
+        "alignment": {"type": "object"},
+        "error": {"type": "null"}
+      }
+    },
+    {
+      "properties": {
+        "status": {"const": "alignment_error"},
+        "token_count": {"type": "null"},
+        "token_logprobs": {"type": "null"},
+        "word_nll": {"type": "null"},
+        "token_normalized_nll": {"type": "null"},
+        "alignment": {"type": "null"},
+        "error": {"type": "object"}
+      }
+    }
+  ],
+  "$defs": {
+    "span": {
+      "type": "array",
+      "prefixItems": [{"type": "integer", "minimum": 0}, {"type": "integer", "minimum": 0}],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    }
+  }
+}

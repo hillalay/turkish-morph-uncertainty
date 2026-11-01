@@ -1,84 +1,61 @@
+"""Run tokenizer-only leading-space diagnostics; this does not produce NLL results."""
 
+import argparse
 import json
+import re
+from importlib.metadata import version
 from pathlib import Path
-from transformers import AutoTokenizer
 
-MODEL_ID = "nafie-ai/nafie-473M"
-
-tokenizer = AutoTokenizer.from_pretrained(
-    MODEL_ID,
-    trust_remote_code=False,
-    use_fast=True,
+from turkish_llm_morphology.token_boundary import (
+    MEASUREMENT_POLICY,
+    TOKENIZATION_SETTINGS,
+    check_alignment,
+    evaluation_config_id,
 )
 
-path = Path("data/pilot/pilot_dataset.jsonl")
+if __package__:
+    from .validate_dataset import ROOT, read_jsonl, validate_dataset_records
+else:
+    from validate_dataset import ROOT, read_jsonl, validate_dataset_records
 
-samples = [
-    json.loads(line)
-    for line in path.read_text(encoding="utf-8").splitlines()
-    if line.strip()
-]
 
-passed = 0
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model-id", default="nafie-ai/nafie-473M")
+    parser.add_argument("--revision", required=True, help="immutable tokenizer snapshot/commit")
+    parser.add_argument("--dataset", type=Path, default=ROOT / "data/pilot/pilot_dataset.jsonl")
+    args = parser.parse_args()
+    if re.fullmatch(r"[a-f0-9]{40}", args.revision) is None:
+        parser.error("--revision must be a full immutable Hugging Face commit hash (40 lowercase hex characters)")
+    samples = read_jsonl(args.dataset)
+    validate_dataset_records(samples)
 
-for sample in samples:
-    prefix = sample["prefix"]
-    target = sample["target"]
+    from transformers import AutoTokenizer
 
-    # Yeni politika yalnızca tam bir sondaki boşluk için
-    # test ediliyor.
-    if not prefix.endswith(" "):
-        print(sample["sample_id"], "SKIP: trailing space yok")
-        continue
-
-    context = prefix[:-1]
-    measured_target = " " + target
-    full_text = context + measured_target
-
-    context_ids = tokenizer(
-        context, add_special_tokens=False
-    )["input_ids"]
-
-    encoded = tokenizer(
-        full_text,
-        add_special_tokens=False,
-        return_offsets_mapping=True,
+    tokenizer = AutoTokenizer.from_pretrained(
+        args.model_id, revision=args.revision, trust_remote_code=False, use_fast=True,
     )
+    config = {
+        "tokenizer_id": args.model_id,
+        "tokenizer_revision": args.revision,
+        "transformers_version": version("transformers"),
+        "tokenizers_version": version("tokenizers"),
+        **TOKENIZATION_SETTINGS,
+    }
+    config_id = evaluation_config_id(MEASUREMENT_POLICY, config)
+    passed = 0
+    for sample in samples:
+        diagnostic = check_alignment(tokenizer, sample["prefix"], sample["target"])
+        passed += diagnostic["status"] == "ok"
+        print(json.dumps({
+            "sample_id": sample["sample_id"],
+            "measurement_policy": MEASUREMENT_POLICY,
+            "tokenization_config": config,
+            "evaluation_config_id": config_id,
+            **diagnostic,
+        }, ensure_ascii=False))
+    print(f"TOTAL: {passed}/{len(samples)} PASS")
 
-    full_ids = encoded["input_ids"]
-    offsets = encoded["offset_mapping"]
 
-    stable = full_ids[:len(context_ids)] == context_ids
-
-    target_ids = full_ids[len(context_ids):]
-    target_start = len(context)
-
-    spans = offsets[len(context_ids):]
-
-    exact_coverage = (
-        bool(spans)
-        and spans[0][0] == target_start
-        and spans[-1][1] == len(full_text)
-        and all(a[1] == b[0] for a, b in zip(spans, spans[1:]))
-    )
-
-    decoded = tokenizer.decode(
-        full_ids, skip_special_tokens=False,
-        clean_up_tokenization_spaces=False
-    )
-
-    roundtrip = decoded == full_text
-    ok = stable and exact_coverage and roundtrip
-
-    passed += int(ok)
-
-    print(f"\n{sample['sample_id']} - {target}")
-    print("Context:", repr(context))
-    print("Measured target:", repr(measured_target))
-    print("Target IDs:", target_ids)
-    print("Prefix stable:", stable)
-    print("Exact coverage:", exact_coverage)
-    print("Roundtrip:", roundtrip)
-    print("Result:", "PASS" if ok else "ERROR")
-
-print(f"\nTOTAL: {passed}/{len(samples)} PASS")
+if __name__ == "__main__":
+    main()

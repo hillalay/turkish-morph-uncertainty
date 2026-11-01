@@ -1,8 +1,9 @@
 Veri Sözleşmesi
 Bu belge, morfoloji modülünün ürettiği deney örnekleri ile LLM modülünün
-ürettiği olasılık sonuçları arasındaki sürüm 1 sözleşmesidir. Normatif makine
-şemaları data/schema/dataset.schema.json ve
-data/schema/model_result.schema.json dosyalarıdır. Dosyalar UTF-8, her satırda
+ürettiği olasılık sonuçları arasındaki sözleşmedir. Veri kümesi v1 olarak kalır;
+sonuçlar v1 veya aşağıda tanımlanan v2 olabilir. Normatif makine şemaları
+data/schema/dataset.schema.json, data/schema/model_result.schema.json ve
+data/schema/model_result.v2.schema.json dosyalarıdır. Dosyalar UTF-8, her satırda
 tek JSON nesnesi bulunan JSONL biçimindedir ve boş satırlar yok sayılır.
 Deney örneği
 Her kayıt aşağıdaki alanları taşır:
@@ -89,7 +90,7 @@ Dilbilim ekibinin veri kümesini büyütmeden önce kesinleştirmesi gereken kar
 - çözümleyiciler farklı segmentasyon verdiğinde kullanılacak öncelik kuralı.
 Bu kararlardan biri mevcut sayıları değiştirirse sözleşme/veri kümesi sürümü
 artırılmalı; yayımlanmış sample_id kayıtları yerinde değiştirilmemelidir.
-Model sonucu
+Model sonucu — v1 (geriye dönük sözleşme)
 Her sonuçta sample_id, model_id, model_revision,
 evaluation_config_id, token_count, token_logprobs, word_nll ve
 token_normalized_nll bulunur. Bir sonucun benzersiz anahtarı:
@@ -125,6 +126,196 @@ Tokenizer hedef sınırlarını tam olarak hizalayamıyorsa veya güvenilir ofse
 error.code="TARGET_ALIGNMENT_FAILED" ile yazılır; token ve NLL alanları ile
 alignment alanı null olur. Böylece hata görünür kalır ve yanlış değerler
 sessizce analize girmez.
+
+## Model sonucu v2 — Token Boundary Policy v2
+
+### Pilot bulguları ve kapsam
+
+Nafie-473M (`nafie-ai/nafie-473M`) tokenizer'ıyla mevcut beş pilot örnekte,
+v1'in yalnızca sözcüğü kapsayan katı sınır politikası **0/5 PASS** verdi:
+beş örneğin tamamında `alignment_error` oluştu. Bağlamın sonundaki tek ASCII
+boşluğunu ölçülen hedefe taşıyan alternatif deney **5/5 PASS** verdi. Bunlar
+Issue #2'de bildirilen tokenizer pilotu sonuçlarıdır. 1 Kasım 2026'da yerel
+önbellekten, ağ erişimi kapalı olarak yeniden doğrulandı: katı aralık kontrolü
+**0/5**, yeni `check_alignment` kapısı **5/5 PASS** verdi. Kullanılan snapshot
+`20477766abe4ca9e5ef3ef8891164a346887bba8`, Transformers `5.22.1`, Tokenizers
+`0.23.3`; yeni politikanın config kimliği
+`leading_space_in_target_v1:sha256:21cfab8126872fe8943219a33ce78423c929ccaf77bfd4fc14588d816636d194`
+oldu. Model ağırlığı yüklenmedi. İlk pilotun revizyonu ayrıca saklanmadığı için
+bu bilgiler yeni doğrulama koşulunu tanımlar. Beş örnek diğer modeller veya tüm
+Türkçe girdiler için başarı garantisi değildir.
+
+Ceren'in dataset şeması, beş pilot kayıt, `prefix` ve `target` değişmez.
+Yeni ölçüm politikası yalnızca sonuç sözleşmesine uygulanır; v1 şeması yerinde
+korunur. Eski sonuçlar yeni politika kullanılmış gibi yeniden etiketlenmez.
+
+### `leading_space_in_target_v1` tanımı
+
+`prefix` sonundaki boşluk dizisi tam olarak bir U+0020 olmalıdır. Sonda boşluk
+bulunmaması, iki veya daha fazla boşluk, tab/NBSP veya bunları izleyen ASCII
+boşluk bu politika için desteklenmez. Hedef tek, boş olmayan NFC sözcüktür.
+
+```python
+context = prefix[:-1]
+measured_target = " " + target
+full_text = context + measured_target  # Aynen prefix + target.
+linguistic_target_char_span = [len(prefix), len(full_text)]
+measured_target_char_span = [len(context), len(full_text)]
+```
+
+İki aralık da Unicode kod noktalarıyla sıfır tabanlı, yarı açıktır. Örneğin
+`prefix="Dün "`, `target="geldim"` için dilbilimsel aralık `[4, 10)`, ölçülen
+aralık `[3, 10)` olur. Morfolojik özellikler ve ek sayısı yalnızca `geldim`
+sözcüğünü niteler; ölçülen token dizisi başındaki boşluğu da içerir.
+
+### Boşluk dahil ölçümün matematiksel anlamı
+
+`C = tokenize(context)` ve tam metnin tokenları `F = C + T` olmak üzere,
+ölçülecek değer tokenizer'ın seçtiği ardışık hedef token yolu için
+`P(T | C) = product_i P(T_i | C, T_<i)` olacaktır. Metin düzeyindeki kısa
+gösterimi `P(" " + target | context)` şeklindedir. Bu, v1'deki
+`P(target | prefix)` ile aynı koşullu olay değildir. Boşluk ile sözcük tek
+tokenda birleşebildiği için ayrı bir boşluk tokenının olasılığını sonradan
+çıkararak v1 değerine dönüştürmek genel olarak mümkün değildir. Bu skor,
+aynı metni decode eden tüm alternatif token yollarının toplamı da değildir.
+
+Alan adları korunur: `word_nll = -sum(token_logprobs)` artık boşluk dahil
+**ölçülen dizinin** toplam NLL'sidir; yalnız dilbilimsel sözcüğün NLL'si diye
+yorumlanmaz. `token_normalized_nll = word_nll / token_count` ve `token_count`
+aynı ölçülen diziyi esas alır. Birim doğal logaritmayla nattır. Farklı ölçüm
+politikaları veya tokenizerlarla elde edilen skorlar tek deney koşulu olarak
+birleştirilmez.
+
+### v1/v2 alanları ve sürüm seçimi
+
+v1 dosyası ve kimliği `urn:turkish-llm-morphology:schema:model-result:v1`
+değişmez. Eski, `schema_id` taşımayan kayıtlar v1 ile doğrulanır. v2'nin ayrı
+şema kimliği `urn:turkish-llm-morphology:schema:model-result:v2` olup her v2
+kaydı bunu `schema_id` alanında taşır. Bilinmeyen veya null kimlik reddedilir;
+v2 alanları bulunan kimliksiz bir kayıt v1'in kapalı şemasından geçemez.
+Aynı JSONL dosyasında iki sürüm bulunabilir; otomatik dönüşüm yapılmaz.
+
+| Alan | v2 anlamı |
+| --- | --- |
+| `schema_id` | Yukarıdaki v2 kimliği; zorunlu sürüm ayıracı. |
+| `measurement_policy` | Tam olarak `leading_space_in_target_v1`; hata kayıtlarında da zorunlu. |
+| `tokenization_config` | Tokenizer kimliği, değişmez snapshot revizyonu, kütüphane sürümleri ve sabit ayarlar. |
+| `evaluation_config_id` | Politika ve tokenizer ayarlarından türetilen doğrulanabilir kimlik. |
+| `alignment.linguistic_target_char_span` | Orijinal hedef sözcüğün aralığı. |
+| `alignment.measured_target_char_span` | Baştaki tek boşluk dahil ölçülen aralık. |
+| `alignment.target_token_indices` | Özel token içermeyen tam girdide, ölçülen hedefin ardışık token konumları. |
+| `alignment.target_token_char_spans` | Aynı tokenların ölçülen hedefi eksiksiz kapsayan karakter aralıkları. |
+
+v1'in belirsiz `alignment.target_char_span` alanı yalnızca v1'de kalır; v2'de
+iki açık aralık kullanılır. `sample_id`, `model_id`, `model_revision`,
+`evaluation_config_id`, `token_count`, `token_logprobs`, `word_nll`,
+`token_normalized_nll`, `status` ve `error` adları korunur. Benzersiz sonuç
+anahtarı da değişmez. Başarılı kayıtta bütün metrikler ile hizalama zorunludur,
+`error=null` olur. Başarısızlıkta `status="alignment_error"`,
+`error.code="TARGET_ALIGNMENT_FAILED"` ve açıklayıcı `error.message` yazılır;
+dört metrik alanı ve `alignment` null olur. Politika/config kimliği korunur.
+
+### Ayarlar ve deney kimliği
+
+`tokenization_config` şu alanların tamamını taşır:
+
+- `tokenizer_id`, `tokenizer_revision`: Değişmez tokenizer dosyalarının kaynağı
+  ve snapshot kimliği. Model ağırlık revizyonu ayrıca `model_revision` içindedir.
+- `transformers_version`, `tokenizers_version`: Kullanılan kütüphane sürümleri.
+- `use_fast=true`, `add_special_tokens=false`, `padding=false`, `truncation=false`,
+  `skip_special_tokens=false`, `clean_up_tokenization_spaces=false`.
+
+Chat template, metin normalizasyonu, elle BOS/EOS ekleme ve tokenizer
+ayarlarını yüklemeden sonra değiştirme bu politikada kullanılmaz. Tokenizer'ın
+dahili normalizer/pre-tokenizer ayarları değişmez snapshot içindeki dosyalardan
+gelir; ek yükleme override'ları desteklenmez. Farklı ayar gerektiren modeller
+için yeni sürümlü politika/config sözleşmesi gerekir.
+
+Kimlik üretimi `turkish_llm_morphology.token_boundary.evaluation_config_id`
+ile yapılır. `{"measurement_policy": ..., "tokenization_config": ...}` nesnesi
+`json.dumps(ensure_ascii=False, sort_keys=True, separators=(",", ":"),
+allow_nan=False)` ile serileştirilir; UTF-8 baytlarının SHA-256 özeti alınır.
+Kimlik `leading_space_in_target_v1:sha256:<64 küçük hex karakter>` biçimindedir.
+Doğrulayıcı hata kayıtlarında dahi özeti yeniden hesaplar. Politika veya
+ayar değişip eski kimlik korunursa kayıt reddedilir. Aynı doğrulama girdisinde
+v1/v2'nin aynı config kimliğini paylaşması da reddedilir. Ayrı dosyalardan
+analiz yapılacaksa birleşimleri birlikte doğrulanmalıdır. Kimlik beyan edilen
+ayarları bağlar; tokenizer'ın gerçekten o snapshot'tan geldiğini çevrimdışı
+sonuç şeması tek başına kanıtlayamaz.
+
+### Hizalama kapısı, BOS/EOS ve teacher forcing
+
+`check_alignment` sadece tokenizer kullanır. Aşağıdaki koşulların tamamı
+sağlanmadan model olasılığı hesaplanmamalıdır:
+
+1. Desteklenen politika, tek ASCII boşluk ve NFC önkoşulları sağlanır.
+2. `context` ve `full_text`, özel token, padding veya truncation olmadan
+   tokenlaştırılır. `context_ids == full_ids[:len(context_ids)]` olmalıdır.
+3. `m=len(context_ids)>0` olmalıdır. Hedef tokenları tam metnin `[m, n)`
+   son ekidir; `target_token_indices = list(range(m, n))` olur.
+4. Token ID/ofset sayıları eşleşir. Ofsetler geçerli Unicode kod noktalarıdır;
+   bağlam tokenları ölçülen hedefe taşamaz. Hedefin tüm token aralıkları pozitif
+   uzunluklu ve ardışıktır; ilk başlangıç ve son bitiş ölçülen aralıkla aynıdır.
+   Arada boşluk veya örtüşme olamaz. Byte/UTF-16 ofsetleri bu uygulamada otomatik
+   çevrilmez; ilgili tokenizer ayrıca doğrulanıp kod noktalarına uyarlanmalıdır.
+5. Hem bağlamın hem tam metnin decode çıktısı, temizleme ve özel token atlama
+   kapalıyken orijinal metinle birebir eşleşir.
+6. BOS/EOS dahil `all_special_ids` içindeki hiçbir ID girdide bulunamaz.
+   EOS hedef olasılığına dahil değildir. BOS kapalı olduğundan boş bağlam
+   reddedilir; sessizce BOS eklenmez.
+
+Gelecekte causal LM teacher forcing girdisi aynen `full_ids` olacaktır. Sıfır
+tabanlı hedef tokenı `j`, `logits[0, j-1, :]` dağılımından ölçülür. Yani hedef
+ID'leri `full_ids[m:n]`, karşılık gelen logit dilimi `logits[0, m-1:n-1, :]`
+olacaktır. Bunlar batch/padding eklenmeden önceki konumlardır. Başka bir BOS,
+şablon veya padding eklenirse bu eşleşme kullanılamaz; mevcut politikada bu
+değişiklikler yasaktır. Şu anda bu logit okuma ve NLL hesaplama kodu yoktur.
+
+Koşullardan biri sağlanmazsa hizalama sonucu `alignment_error` olarak döner;
+alternatif politikaya geçilmez ve desteklenmeyen örnekler sessizce atlanmaz.
+JSON Schema/sonuç doğrulayıcısı aralıkları, kimliği ve mevcut NLL denklemlerini
+denetler; gerçek token ID kararlılığı ve decode için üretimden önce bu çalışma
+zamanı kontrolü ayrıca zorunludur.
+
+### Gelecek modeller için doğrulama prosedürü
+
+Önce testler model ağırlıkları ve gerçek tokenizer indirmeden çalıştırılır:
+
+```bash
+python -m unittest discover -s tests -v
+python scripts/validate_dataset.py dataset data/pilot/pilot_dataset.jsonl
+```
+
+Ardından kurulu tokenizer ortamında değişmez revizyon seçilerek yalnız tokenizer
+pilotu çalıştırılır; bu komut model ağırlığı yüklemez:
+
+```bash
+python scripts/check_boundary_policy.py --model-id nafie-ai/nafie-473M --revision <commit>
+```
+
+Betik tam 40 karakterli küçük hex commit kimliği ister; `main` gibi hareketli
+revizyonları reddeder. Bu kimliği ve kütüphane sürümlerini config'e kaydeder;
+her örnek için JSON tanı satırı ve sonunda PASS toplamı yazar. Bunlar NLL
+sonuçları değildir, v2 sonuç dosyası olarak kullanılmaz. `explore_tokenizer.py`
+ilk katı sınır pilotunun tarihsel keşif betiğidir; v2 ölçüm kapısı değildir.
+
+Her yeni tokenizer/model revizyonunda beş kayıtla başlandıktan sonra 30–50
+örneklik daha geniş pilotta başarılı/hatalı hizalama sayısı ve oranı, sınır
+taşmaları, ek sayısı/hedef uzunluğu dağılımları raporlanmalıdır. Başarı yalnız
+geçen alt küme için geçerlidir; seçici dışlanma analiz edilmelidir. Sonraki model
+entegrasyonu, `status="ok"` kapısından sonra öğretmen zorlaması konumlarını
+ayrıca doğrulamalı ve tamamlanan v2 kayıtlarını veri kümesiyle birlikte mevcut
+sonuç doğrulayıcısından geçirmelidir.
+
+**Uygulama durumu:** Tokenizer hizalaması ve sürümlü sonuç doğrulaması mevcut.
+Model ağırlıkları yüklenmedi. Modelden `token_logprobs`, NLL veya predictive
+entropy üreten modül henüz geliştirilmedi. Testlerdeki olasılıklar yalnızca
+sözleşme kontrolü için yapay değerlerdir; araştırma sonucu değildir.
+Yerel pilotta Transformers, `nafie` model tipi için uyumluluk uyarısı verdi;
+tokenizer kontrolü geçti, gerçek model mimarisinin yüklenebilirliği henüz
+doğrulanmadı. Sözleşme bir sonraki entegrasyon adımına hazırdır; uçtan uca model
+ölçümünün hazır olduğu anlamına gelmez.
+
 Doğrulama
 Kurulum ve temel kontroller:
 python -m pip install -e .
@@ -136,7 +327,10 @@ JSON Schema alanları, türleri, kontrollü değerleri ve başarı/hata kayıt
 benzersizliğini, NFC kullanımını, seçili çözümlemeyi, ek sayısını, hedef/token
 aralıklarını ve NLL denklemlerini kontrol eder.
 Planlanan araştırma genişletmeleri ve açık metodolojik kararlar
-Durum: Planlandı; sürüm 1'de uygulanmadı. Bu bölüm araştırma yol haritasıdır. Yukarıdaki normatif alanları, mevcut JSON şemalarını, doğrulayıcıyı veya geçerli kayıt koşullarını değiştirmez. Uygulamadan önce deney protokolü ve uygun şema sürümü güncellenmelidir.
+Bu bölüm araştırma yol haritasıdır; hizalama pilotunun güncel durumu 4. maddede
+belirtilir. Diğer genişletmeler planlandı, henüz uygulanmadı. Bu bölüm yukarıdaki
+normatif alanları ve geçerli kayıt koşullarını değiştirmez. Yeni genişletmeler
+uygulanmadan önce deney protokolü ve uygun şema sürümü güncellenmelidir.
 
 1. Predictive entropy — temel araştırma metriği (planlandı)
 Token düzeyindeki predictive entropy, modelin hedef tokenı üretmeden hemen önce, sözlükteki tüm olası sonraki tokenlara dağıttığı olasılığın belirsizliğini ölçer:
@@ -170,19 +364,14 @@ Mevcut sürüm 1 kapsamı simple_verb_inflection ve noun_case için en az bir a�
 - Sıfır ekli kayıtlar kabul edilecekse ayrı bir experiment_type veya açıkça tanımlanmış bir kontrol politikası, uygun bağlam şablonları ve gerekirse farklı karşılaştırma analizleri tasarlanacaktır.
 - Sıfır ekli kontrol olmadan da çekimli biçimler arasında ek sayısı 1, 2, 3, ... düzeylerindeki ilişkiler test edilebilir; araştırmanın iddiası buna göre sınırlandırılmalıdır.
 Durum: Değerlendirilecek; Not Implemented. Mevcut en-az-bir-ek kuralı değiştirilmemiştir.
-4. Tokenizer hizalama politikası — pilotta sınanacak
-Sürüm 1'in katı karakter-token sınırı kuralı korunur. Gerçek bir veya birkaç tokenizerla 30–50 örnekli pilot çalıştırılacak; her model/tokenizer için aşağıdakiler raporlanacaktır:
-1. Toplam kayıt, başarılı hizalama sayısı ve alignment_error sayısı/oranı.
-2. Başında boşluk içeren tokenların davranışı ve sınır taşması örnekleri.
-3. Geçerli ve reddedilen örneklerin ek sayısı, hedef uzunluğu ve diğer özellikler bakımından dağılımı.
-4. Olası alternatif hizalama politikalarının hedef dizinin hangi koşullu olasılığını ölçtüğüne etkisi.
-Pilot görülmeden katı reddetme kuralı değiştirilmez. Hata oranı yüksekse alternatifler ayrı bir metodolojik karar ve sürüm değişikliği ile ele alınır. Amaç sessiz yanlış ölçümü önlemek kadar, bazı morfolojik grupların seçici biçimde analiz dışında kalmasını da saptamaktır.
-
-Durum: Pilot doğrulaması bekleniyor.
+4. Tokenizer hizalama politikası — ilk pilot tamamlandı
+İlk beş örnekte katı politika 0/5, boşluk dahil alternatif 5/5 PASS verdi.
+v1 korunur; v2'nin normatif kuralları ve 30–50 örneklik gelecek pilot prosedürü
+yukarıdaki Token Boundary Policy v2 bölümündedir. Geniş pilot henüz yapılmadı.
 5. Metrik ve geliştirme takvimi
 Metrik / özellik	Amaç	Uygulama durumu
 affix_count ve ek türleri	Morfolojik bağımsız değişkenler	Veri sözleşmesinde tanımlı; gerçek morfoloji modülü henüz yok
-Token/subword sayısı	Tokenizer parçalanma etkisi	İlk LLM geliştirme aşaması — planlandı
+Token/subword sayısı	Tokenizer parçalanma etkisi	Hizalama kapısında hedef token konumları mevcut; model ölçümü henüz yok
 word_nll	Hedef dizinin toplam negatif log olabilirliği	Sözleşmede tanımlı; hesaplama henüz uygulanmadı
 token_normalized_nll	Model içi token başına ortalama NLL	Sözleşmede tanımlı; hesaplama henüz uygulanmadı
 Token-level predictive entropy	Konum başına tüm sözlük dağılımının entropisi	Sonraki LLM Issue — planlandı
@@ -192,4 +381,4 @@ Perplexity	Uygun birim/normalizasyonla ortalama NLL'nin üstel dönüşümü	Ger
 
 Araştırma yorumu: Morfolojik ek sayısı, kelime uzunluğu, modelin subword sayısı ve bağlam uygunluğu birbirinden ayrı tutulacaktır. word_nll ve entropy farklı olguları ölçer. Modeller arası kıyas yapılırken farklı tokenizerların tanımladığı birimler ve geçerli örnek kümeleri raporlanacaktır.
 6. Kararlar için tamamlanma koşulları
-Veri kümesi pilotun ötesine büyütülmeden önce kontrollü karşılaştırma grupları ile sıfır ekli kontrol grubunun dahil edilip edilmeyeceği karara bağlanacak. İlk LLM pilotundan sonra hizalama politikası değerlendirilecek. Entropy alanlarının kesin şeması, hesaplama testleri ve çıktı biçimi ayrı bir geliştirme Issue'sunda belirlenecek. Her normatif değişiklik, ilgili JSON Schema / doğrulayıcı / testler ve belge birlikte güncellenerek sürümlendirilecektir.
+Veri kümesi pilotun ötesine büyütülmeden önce kontrollü karşılaştırma grupları ile sıfır ekli kontrol grubunun dahil edilip edilmeyeceği karara bağlanacak. Geniş tokenizer pilotundan sonra v2 hizalama politikasının kapsama oranı değerlendirilecek. Entropy alanlarının kesin şeması, hesaplama testleri ve çıktı biçimi ayrı bir geliştirme Issue'sunda belirlenecek. Her normatif değişiklik, ilgili JSON Schema / doğrulayıcı / testler ve belge birlikte güncellenerek sürümlendirilecektir.

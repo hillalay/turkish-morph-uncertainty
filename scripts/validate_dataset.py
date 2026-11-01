@@ -12,6 +12,13 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 
+from turkish_llm_morphology.token_boundary import (
+    AlignmentError,
+    RESULT_SCHEMA_ID,
+    evaluation_config_id,
+    target_char_spans,
+    validate_token_spans,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_DIR = ROOT / "data" / "schema"
@@ -38,12 +45,22 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return records
 
 
-def _validate_schema(records: list[dict[str, Any]], schema_name: str) -> None:
-    schema = json.loads((SCHEMA_DIR / schema_name).read_text(encoding="utf-8"))
-    validator = Draft202012Validator(schema)
+def _validate_schema(records: list[dict[str, Any]], schema_name: str | None) -> None:
+    validators = {}
     for index, record in enumerate(records, start=1):
+        name = schema_name
+        if name is None:
+            if "schema_id" not in record:
+                name = "model_result.schema.json"
+            elif record["schema_id"] == RESULT_SCHEMA_ID:
+                name = "model_result.v2.schema.json"
+            else:
+                raise ContractValidationError(f"record {index}: unsupported schema_id")
+        if name not in validators:
+            schema = json.loads((SCHEMA_DIR / name).read_text(encoding="utf-8"))
+            validators[name] = Draft202012Validator(schema)
         errors = sorted(
-            validator.iter_errors(record),
+            validators[name].iter_errors(record),
             key=lambda error: tuple(str(part) for part in error.absolute_path),
         )
         if errors:
@@ -117,11 +134,20 @@ def validate_result_records(
     records: list[dict[str, Any]], dataset_records: list[dict[str, Any]]
 ) -> None:
     validate_dataset_records(dataset_records)
-    _validate_schema(records, "model_result.schema.json")
+    _validate_schema(records, None)
     samples = {record["sample_id"]: record for record in dataset_records}
     seen: set[tuple[str, str, str, str]] = set()
+    configurations = {}
 
     for index, record in enumerate(records, start=1):
+        is_v2 = record.get("schema_id") == RESULT_SCHEMA_ID
+        config_id = record["evaluation_config_id"]
+        signature = (record["measurement_policy"], record["tokenization_config"]) if is_v2 else ("v1",)
+        if config_id in configurations and configurations[config_id] != signature:
+            raise ContractValidationError(f"record {index}: evaluation_config_id mixes measurement policies/settings")
+        configurations[config_id] = signature
+        if is_v2 and config_id != evaluation_config_id(*signature):
+            raise ContractValidationError(f"record {index}: evaluation_config_id does not match policy/settings")
         key = tuple(
             record[field]
             for field in ("sample_id", "model_id", "model_revision", "evaluation_config_id")
@@ -143,22 +169,33 @@ def validate_result_records(
         spans = alignment["target_token_char_spans"]
         if not (token_count == len(logprobs) == len(indices) == len(spans)):
             raise ContractValidationError(f"record {index}: token-aligned arrays must match token_count")
-        if indices != list(range(indices[0], indices[0] + token_count)):
-            raise ContractValidationError(f"record {index}: target token indices must be contiguous")
         if any(not math.isfinite(value) or value > 0 for value in logprobs):
             raise ContractValidationError(f"record {index}: token_logprobs must be finite and <= 0")
 
         expected_char_span = [len(sample["prefix"]), len(sample["prefix"]) + len(sample["target"])]
-        if alignment["target_char_span"] != expected_char_span:
+        if is_v2:
+            try:
+                linguistic_span, expected_char_span = target_char_spans(
+                    sample["prefix"], sample["target"], record["measurement_policy"]
+                )
+            except AlignmentError as exc:
+                raise ContractValidationError(f"record {index}: {exc}") from exc
+            if alignment["linguistic_target_char_span"] != linguistic_span:
+                raise ContractValidationError(f"record {index}: linguistic_target_char_span does not match dataset")
+            if alignment["measured_target_char_span"] != expected_char_span:
+                raise ContractValidationError(f"record {index}: measured_target_char_span does not match policy")
+        elif alignment["target_char_span"] != expected_char_span:
             raise ContractValidationError(f"record {index}: target_char_span does not match prefix + target")
-        if spans[0][0] != expected_char_span[0] or spans[-1][1] != expected_char_span[1]:
-            raise ContractValidationError(f"record {index}: token spans do not cover the target exactly")
-        if any(start >= end for start, end in spans) or any(
-            spans[position][1] != spans[position + 1][0] for position in range(len(spans) - 1)
-        ):
-            raise ContractValidationError(f"record {index}: target token spans must be non-empty and contiguous")
+        try:
+            validate_token_spans(indices, spans, expected_char_span)
+        except AlignmentError as exc:
+            raise ContractValidationError(f"record {index}: {exc}") from exc
 
         expected_nll = -sum(logprobs)
+        if not all(math.isfinite(value) for value in (
+            expected_nll, record["word_nll"], record["token_normalized_nll"]
+        )):
+            raise ContractValidationError(f"record {index}: NLL values must be finite")
         if not math.isclose(record["word_nll"], expected_nll, rel_tol=1e-9, abs_tol=1e-9):
             raise ContractValidationError(f"record {index}: word_nll does not equal -sum(token_logprobs)")
         expected_normalized = expected_nll / token_count
