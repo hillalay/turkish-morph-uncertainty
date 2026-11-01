@@ -58,9 +58,9 @@ def validate_token_spans(indices: list, spans: list, target_span: list) -> None:
         raise AlignmentError("target token spans must be non-empty and contiguous")
 
 
-def check_alignment(tokenizer, prefix: str, target: str,
-                    measurement_policy: str = MEASUREMENT_POLICY) -> dict:
-    """Return an alignment diagnostic; callers must gate scoring on status='ok'."""
+def tokenize_aligned_target(tokenizer, prefix: str, target: str,
+                            measurement_policy: str = MEASUREMENT_POLICY) -> dict:
+    """Return alignment and the exact checked input IDs; errors contain no IDs."""
     try:
         linguistic_span, measured_span = target_char_spans(prefix, target, measurement_policy)
         if not tokenizer.is_fast:
@@ -102,6 +102,7 @@ def check_alignment(tokenizer, prefix: str, target: str,
             raise AlignmentError("tokenizer decode does not preserve the original text")
         return {
             "status": "ok",
+            "input_ids": full_ids,
             "alignment": {
                 "linguistic_target_char_span": linguistic_span,
                 "measured_target_char_span": measured_span,
@@ -116,3 +117,11 @@ def check_alignment(tokenizer, prefix: str, target: str,
             "alignment": None,
             "error": {"code": "TARGET_ALIGNMENT_FAILED", "message": str(exc) or type(exc).__name__},
         }
+
+
+def check_alignment(tokenizer, prefix: str, target: str,
+                    measurement_policy: str = MEASUREMENT_POLICY) -> dict:
+    """Return the original alignment diagnostic without model inputs."""
+    result = tokenize_aligned_target(tokenizer, prefix, target, measurement_policy)
+    result.pop("input_ids", None)
+    return result

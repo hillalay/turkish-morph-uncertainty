@@ -264,12 +264,15 @@ sağlanmadan model olasılığı hesaplanmamalıdır:
    EOS hedef olasılığına dahil değildir. BOS kapalı olduğundan boş bağlam
    reddedilir; sessizce BOS eklenmez.
 
-Gelecekte causal LM teacher forcing girdisi aynen `full_ids` olacaktır. Sıfır
+Nafie pilotunda causal LM teacher forcing girdisi aynen `full_ids` olur. Sıfır
 tabanlı hedef tokenı `j`, `logits[0, j-1, :]` dağılımından ölçülür. Yani hedef
 ID'leri `full_ids[m:n]`, karşılık gelen logit dilimi `logits[0, m-1:n-1, :]`
 olacaktır. Bunlar batch/padding eklenmeden önceki konumlardır. Başka bir BOS,
 şablon veya padding eklenirse bu eşleşme kullanılamaz; mevcut politikada bu
-değişiklikler yasaktır. Şu anda bu logit okuma ve NLL hesaplama kodu yoktur.
+değişiklikler yasaktır. Logit okuma ve NLL hesabı `token_nll.py` içinde uygulanır;
+FP16 logits normalizasyondan önce FP32'ye çevrilir. Uygulama ayrıntıları ve gerçek
+beş örneğin sonuçları [token_nll.md](token_nll.md) belgesindedir. Normatif v1/v2
+alanları ve şemaları değişmemiştir.
 
 Koşullardan biri sağlanmazsa hizalama sonucu `alignment_error` olarak döner;
 alternatif politikaya geçilmez ve desteklenmeyen örnekler sessizce atlanmaz.
@@ -307,14 +310,14 @@ entegrasyonu, `status="ok"` kapısından sonra öğretmen zorlaması konumların
 ayrıca doğrulamalı ve tamamlanan v2 kayıtlarını veri kümesiyle birlikte mevcut
 sonuç doğrulayıcısından geçirmelidir.
 
-**Uygulama durumu:** Tokenizer hizalaması ve sürümlü sonuç doğrulaması mevcut.
-Model ağırlıkları yüklenmedi. Modelden `token_logprobs`, NLL veya predictive
-entropy üreten modül henüz geliştirilmedi. Testlerdeki olasılıklar yalnızca
-sözleşme kontrolü için yapay değerlerdir; araştırma sonucu değildir.
-Yerel pilotta Transformers, `nafie` model tipi için uyumluluk uyarısı verdi;
-tokenizer kontrolü geçti, gerçek model mimarisinin yüklenebilirliği henüz
-doğrulanmadı. Sözleşme bir sonraki entegrasyon adımına hazırdır; uçtan uca model
-ölçümünün hazır olduğu anlamına gelmez.
+**Uygulama durumu:** Tokenizer hizalaması, sürümlü sonuç doğrulaması ve Nafie için
+teacher forcing ile `token_logprobs`/NLL hesabı mevcut. Model sabit revizyonda
+CUDA/FP16 yüklendi; beş gerçek pilot sonucu v2 doğrulamasından geçti. Sayısal
+profil ve çalışma hataları ayrı çalışma raporunda tutulur; v2 sonuç şeması
+yalnız `alignment_error` durumunu desteklediğinden sayısal hatalar bu durumla
+karıştırılmaz. Ayrıntılar [token_nll.md](token_nll.md) belgesindedir.
+Predictive entropy hâlâ uygulanmadı. Transformers'ın tokenizer aşamasındaki
+`nafie` model tipi uyarısı bu sabit ortamda model yükleme/ölçümünü engellemedi.
 
 Doğrulama
 Kurulum ve temel kontroller:
@@ -372,8 +375,8 @@ yukarıdaki Token Boundary Policy v2 bölümündedir. Geniş pilot henüz yapıl
 Metrik / özellik	Amaç	Uygulama durumu
 affix_count ve ek türleri	Morfolojik bağımsız değişkenler	Veri sözleşmesinde tanımlı; gerçek morfoloji modülü henüz yok
 Token/subword sayısı	Tokenizer parçalanma etkisi	Hizalama kapısında hedef token konumları mevcut; model ölçümü henüz yok
-word_nll	Hedef dizinin toplam negatif log olabilirliği	Sözleşmede tanımlı; hesaplama henüz uygulanmadı
-token_normalized_nll	Model içi token başına ortalama NLL	Sözleşmede tanımlı; hesaplama henüz uygulanmadı
+word_nll	Hedef dizinin toplam negatif log olabilirliği	Nafie pilotunda teacher forcing ile uygulandı
+token_normalized_nll	Model içi token başına ortalama NLL	Nafie pilotunda teacher forcing ile uygulandı
 Token-level predictive entropy	Konum başına tüm sözlük dağılımının entropisi	Sonraki LLM Issue — planlandı
 Hedef sözcük entropy özeti	Hedef token konumları boyunca ortalama vb.	Sonraki LLM Issue — planlandı
 Perplexity	Uygun birim/normalizasyonla ortalama NLL'nin üstel dönüşümü	Gerekirse analiz aşamasında

@@ -1,0 +1,65 @@
+{
+  "report_kind": "nll_run_not_model_result",
+  "status": "ok",
+  "started_at_utc": "2026-11-01T17:24:12.915897+00:00",
+  "model_id": "nafie-ai/nafie-473M",
+  "model_revision": "20477766abe4ca9e5ef3ef8891164a346887bba8",
+  "code_revision": "20477766abe4ca9e5ef3ef8891164a346887bba8",
+  "scoring_profile": "single_cuda_fp16_logsoftmax_fp32_v1",
+  "scoring_settings": {
+    "batch_size": 1,
+    "padding": false,
+    "model_dtype": "torch.float16",
+    "log_softmax_dtype": "torch.float32",
+    "causal_logit_shift": -1,
+    "nll_reduction": "Python sum over FP32 token log probabilities"
+  },
+  "stage": "complete",
+  "computation_errors": [],
+  "results_validated": true,
+  "input_count": 5,
+  "dataset_sha256": "c8f307a69eb1ad3ef37ee473804091ae120d06fd2d8d1cf32af4d0371fe1963c",
+  "environment": {
+    "python": "3.13.5",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "torch": "2.14.1+cu126",
+    "transformers": "5.22.1",
+    "tokenizers": "0.23.3",
+    "huggingface_hub": "2.4.0",
+    "safetensors": "0.8.0",
+    "cuda_runtime": "12.6",
+    "cuda_available": true
+  },
+  "evaluation_config_id": "leading_space_in_target_v1:sha256:21cfab8126872fe8943219a33ce78423c929ccaf77bfd4fc14588d816636d194",
+  "verified_sha256": {
+    "configuration_nafie.py": "5e504f0db6380cc3f1a9a216d5939505a617911deb8bdd9a4433e2a9beb033f9",
+    "modeling_nafie.py": "6ca6801bfe72db3b53388dad055e8362afe129e4465046eb01359caf29480120",
+    "config.json": "fd9518bb374c5495f86c76fb8f1c844ec8bab7806de09a00d6f2273e2e47f5a9",
+    "generation_config.json": "2a72d248d738a6f4650e95f8f84ca0d29244647f7f2487b33ac7a65b64edbcdb",
+    "tokenizer.json": "01125b1e34c915563546552555283a7fd183a522b66f856e8a9cebf0ab70b42a",
+    "tokenizer_config.json": "a1a584f73974811f7eff57a83203e499bf54186ed49f0897b50b32700c5ce183",
+    "model.safetensors": "3e5089e03079b26a1836b355189eceb158daefe2a1248043b5bfd8226ce3f963"
+  },
+  "loading_info": {
+    "missing_keys": [],
+    "unexpected_keys": [],
+    "mismatched_keys": [],
+    "error_msgs": []
+  },
+  "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU",
+  "result_count": 5,
+  "ok_count": 5,
+  "alignment_error_count": 0,
+  "computation_error_count": 0,
+  "memory_after_evaluation": {
+    "allocated_bytes": 967010304,
+    "reserved_bytes": 1015021568,
+    "peak_allocated_bytes": 969304576,
+    "peak_reserved_bytes": 1015021568,
+    "device_free_bytes": 4328521728,
+    "device_total_bytes": 6441926656
+  },
+  "finished_at_utc": "2026-11-01T17:24:32.001161+00:00",
+  "results_file": "nafie_473m_pilot_nll.v2.jsonl",
+  "results_sha256": "8250b03190d701c5aaf45eef488ddec1b42ec35743530a2c67484346d5ebdb71"
+}
