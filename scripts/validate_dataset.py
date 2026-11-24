@@ -207,16 +207,79 @@ def validate_result_records(
             )
 
 
+def validate_morphology_records(records, analyzer, tokenizer=None) -> None:
+    """Opt-in producer checks; the existing v1/v2 contract behavior is unchanged."""
+    from turkish_llm_morphology.morphology.affix_counter import (
+        count_affixes, to_contract_analysis, v1_scope,
+    )
+    from turkish_llm_morphology.token_boundary import MEASUREMENT_POLICY, check_alignment
+
+    validate_dataset_records(records)
+    if not records:
+        raise ContractValidationError("Morphology dataset must not be empty")
+    seen_text = set()
+    for record in records:
+        label = record["sample_id"]
+        prefix, target = record["prefix"], record["target"]
+        if not prefix[:-1].strip():
+            raise ContractValidationError(f"{label}: prefix must contain context")
+        try:
+            target_char_spans(prefix, target, MEASUREMENT_POLICY)
+            analyses = analyzer.analyze(target)
+        except ValueError as exc:
+            raise ContractValidationError(f"{label}: {exc}") from exc
+        text_key = (prefix, target)
+        if text_key in seen_text:
+            raise ContractValidationError(f"{label}: duplicate prefix/target example")
+        seen_text.add(text_key)
+        expected = [to_contract_analysis(a) for a in analyses]
+        if record["morphological_analyses"] != expected:
+            raise ContractValidationError(f"{label}: analyses differ from Zeyrek; alternatives/fields lost")
+        selected = analyses[record["selected_analysis_index"]]
+        try:
+            scope = v1_scope(selected)
+        except ValueError as exc:
+            raise ContractValidationError(f"{label}: {exc}") from exc
+        if record["scope"] != scope or record["affix_count"] != count_affixes(selected):
+            raise ContractValidationError(f"{label}: scope/affix_count disagrees with real analysis")
+        if tokenizer is not None:
+            alignment = check_alignment(tokenizer, prefix, target)
+            if alignment["status"] != "ok":
+                raise ContractValidationError(f"{label}: {alignment['error']['message']}")
+
+
+def load_nafie_tokenizer():
+    from transformers import AutoTokenizer
+    from turkish_llm_morphology.models.nafie import CACHE_DIR, MODEL_ID, REVISION
+
+    return AutoTokenizer.from_pretrained(
+        MODEL_ID, revision=REVISION, cache_dir=CACHE_DIR, local_files_only=True,
+        trust_remote_code=False, use_fast=True,
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("kind", choices=("dataset", "results"))
     parser.add_argument("path", type=Path)
     parser.add_argument("--dataset", type=Path, help="input dataset; required for result validation")
+    parser.add_argument("--morphology", action="store_true", help="also recheck every analysis with Zeyrek")
+    parser.add_argument("--check-nafie-alignment", action="store_true", help="requires --morphology and cached Nafie tokenizer")
     args = parser.parse_args()
+    if args.check_nafie_alignment and not args.morphology:
+        parser.error("--check-nafie-alignment requires --morphology")
+    if args.morphology and args.kind != "dataset":
+        parser.error("--morphology applies to datasets only")
 
     records = read_jsonl(args.path)
     if args.kind == "dataset":
         validate_dataset_records(records)
+        if args.morphology:
+            import logging
+            from turkish_llm_morphology.morphology import TurkishMorphAnalyzer
+            logging.getLogger("zeyrek.rulebasedanalyzer").setLevel(logging.ERROR)
+            tokenizer = load_nafie_tokenizer() if args.check_nafie_alignment else None
+            validate_morphology_records(records, TurkishMorphAnalyzer(), tokenizer)
     else:
         if args.dataset is None:
             parser.error("--dataset is required when kind is 'results'")
