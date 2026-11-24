@@ -1,0 +1,314 @@
+{
+  "experiment_id": "experiment_001_nafie_morphology",
+  "status": "ok",
+  "started_at_utc": "2026-11-24T13:53:56.555591+00:00",
+  "finished_at_utc": "2026-11-24T13:54:14.917568+00:00",
+  "model_id": "nafie-ai/nafie-473M",
+  "model_revision": "20477766abe4ca9e5ef3ef8891164a346887bba8",
+  "tokenizer_revision": "20477766abe4ca9e5ef3ef8891164a346887bba8",
+  "measurement_policy": "leading_space_in_target_v1",
+  "scoring_profile": "single_cuda_fp16_logsoftmax_fp32_v1",
+  "scoring_settings": {
+    "batch_size": 1,
+    "model_dtype": "torch.float16",
+    "log_softmax_dtype": "torch.float32",
+    "causal_logit_shift": -1,
+    "nll_reduction": "Python sum over FP32 token log probabilities"
+  },
+  "input_sha256": {
+    "data\\pilot\\morphology_pilot_dataset.jsonl": "84a3a48d0aa39816e5158441d59426f48a508f2a4b167ec51bacb0c90b56a31e",
+    "data\\pilot\\morphology_pilot_review.json": "63f0c9e77fd354ca88c2d7ce8bf4ca1882577b07f0c18e0bfd7f0919349ec147",
+    "data\\pilot\\morphology_pilot_analyses.jsonl": "6dc8542704a40ebe8187135773e6ad0d8808f67c439ec33f2701e9aff8f1eb4b"
+  },
+  "dataset_sha256": "84a3a48d0aa39816e5158441d59426f48a508f2a4b167ec51bacb0c90b56a31e",
+  "approved_count": 40,
+  "pending_count": 0,
+  "morphological_analysis_count": 79,
+  "git_head": "cfffdb83a6c56865a23d120a297306f2acf8f7ae",
+  "source_sha256": {
+    "scripts\\run_morphology_baseline.py": "d3e3a13498a1a390777b199c8c11e2a691967307e170650daa97198503eadb51",
+    "scripts\\validate_dataset.py": "149c47a49b9fbb7dc91fda49030e1e49e6434fc641be91c6b28cf57c739aabed",
+    "src\\turkish_llm_morphology\\token_nll.py": "aa9bef32ebceae8039a26f9150607fbca0ff4b76fcfd89857440b15204d2298f",
+    "src\\turkish_llm_morphology\\token_boundary.py": "7b163138e6b7db15200f400e0c9f549e76e1c03ceb1e76fa6b136ab98d9c6026",
+    "src\\turkish_llm_morphology\\models\\nafie.py": "3f7700944bd999a1efd175d06de0755c2e8d3816cf39515693b3d8adbe94924d",
+    "src\\turkish_llm_morphology\\morphology\\dataset.py": "cd43199f51d9d76f1a2cf36fbee771b6c4cac9a8abb53e097e4872bcea51f121"
+  },
+  "reference_tolerance": {
+    "abs_tol": 0.0001,
+    "rel_tol": 1e-05
+  },
+  "load_warnings": [
+    {
+      "logger": "transformers.configuration_utils",
+      "message": "You are using a model of type `nafie` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.",
+      "transformers_stack": [
+        {
+          "file": "transformers\\models\\auto\\tokenization_auto.py",
+          "line": 807,
+          "function": "from_pretrained"
+        },
+        {
+          "file": "transformers\\configuration_utils.py",
+          "line": 896,
+          "function": "from_pretrained"
+        }
+      ]
+    }
+  ],
+  "warning_assessment": "AutoTokenizer uses trust_remote_code=False. In Transformers 5.22.1, tokenization_auto.py catches the unknown/custom AutoConfig ValueError and falls back to PreTrainedConfig (model_type=''). configuration_utils.py then warns about nafie versus the empty model_type. Reproduced with tokenizer-only loading; this warning does not identify the causal model class. The causal model is loaded separately with pinned, SHA-256-verified custom code and trust_remote_code=True. Check runtime model/config classes, empty loading diagnostics and finite forwards below. No architecture, checkpoint, tokenizer settings or logging filters changed.",
+  "successful_count": 40,
+  "failed_count": 0,
+  "not_attempted_count": 0,
+  "environment": {
+    "python": "3.13.5",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "torch": "2.14.1+cu126",
+    "transformers": "5.22.1",
+    "tokenizers": "0.23.3",
+    "huggingface_hub": "2.4.0",
+    "safetensors": "0.8.0",
+    "cuda_runtime": "12.6",
+    "cuda_available": true
+  },
+  "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU",
+  "memory_before_load": {
+    "allocated_bytes": 0,
+    "reserved_bytes": 0,
+    "peak_allocated_bytes": 0,
+    "peak_reserved_bytes": 0,
+    "device_free_bytes": 5379194880,
+    "device_total_bytes": 6441926656
+  },
+  "tokenization_config": {
+    "tokenizer_id": "nafie-ai/nafie-473M",
+    "tokenizer_revision": "20477766abe4ca9e5ef3ef8891164a346887bba8",
+    "transformers_version": "5.22.1",
+    "tokenizers_version": "0.23.3",
+    "use_fast": true,
+    "add_special_tokens": false,
+    "padding": false,
+    "truncation": false,
+    "skip_special_tokens": false,
+    "clean_up_tokenization_spaces": false
+  },
+  "verified_sha256": {
+    "configuration_nafie.py": "5e504f0db6380cc3f1a9a216d5939505a617911deb8bdd9a4433e2a9beb033f9",
+    "modeling_nafie.py": "6ca6801bfe72db3b53388dad055e8362afe129e4465046eb01359caf29480120",
+    "config.json": "fd9518bb374c5495f86c76fb8f1c844ec8bab7806de09a00d6f2273e2e47f5a9",
+    "generation_config.json": "2a72d248d738a6f4650e95f8f84ca0d29244647f7f2487b33ac7a65b64edbcdb",
+    "tokenizer.json": "01125b1e34c915563546552555283a7fd183a522b66f856e8a9cebf0ab70b42a",
+    "tokenizer_config.json": "a1a584f73974811f7eff57a83203e499bf54186ed49f0897b50b32700c5ce183",
+    "model.safetensors": "3e5089e03079b26a1836b355189eceb158daefe2a1248043b5bfd8226ce3f963"
+  },
+  "loading_info": {
+    "missing_keys": [],
+    "unexpected_keys": [],
+    "mismatched_keys": [],
+    "error_msgs": []
+  },
+  "load_seconds": 9.696395299999494,
+  "memory_after_load": {
+    "allocated_bytes": 957573120,
+    "reserved_bytes": 1012924416,
+    "peak_allocated_bytes": 957573120,
+    "peak_reserved_bytes": 1012924416,
+    "device_free_bytes": 4366270464,
+    "device_total_bytes": 6441926656
+  },
+  "runtime_architecture": {
+    "model_class": "NafieForCausalLM",
+    "config_class": "NafieConfig",
+    "model_type": "nafie",
+    "architectures": [
+      "NafieForCausalLM"
+    ],
+    "tokenizer_class": "TokenizersBackend",
+    "model_dtype": "torch.float16",
+    "parameter_count": 473019392,
+    "config_dimensions": {
+      "vocab_size": 65536,
+      "hidden_size": 1024,
+      "num_hidden_layers": 36,
+      "max_position_embeddings": 1024
+    }
+  },
+  "inference_seconds": 4.571478500000012,
+  "memory_after_evaluation": {
+    "allocated_bytes": 967010304,
+    "reserved_bytes": 1015021568,
+    "peak_allocated_bytes": 971926016,
+    "peak_reserved_bytes": 1015021568,
+    "device_free_bytes": 4328521728,
+    "device_total_bytes": 6441926656
+  },
+  "reference_comparisons": [
+    {
+      "sample_id": "morph-v1-001",
+      "target": "geldim",
+      "pass": true,
+      "expected_token_count": 1,
+      "actual_token_count": 1,
+      "expected_word_nll": 5.2880983353,
+      "actual_word_nll": 5.288098335266113,
+      "word_nll_delta": -3.388667124681888e-11,
+      "expected_normalized_nll": 5.2880983353,
+      "actual_normalized_nll": 5.288098335266113,
+      "normalized_nll_delta": -3.388667124681888e-11
+    },
+    {
+      "sample_id": "morph-v1-002",
+      "target": "geldik",
+      "pass": true,
+      "expected_token_count": 1,
+      "actual_token_count": 1,
+      "expected_word_nll": 9.1152467728,
+      "actual_word_nll": 9.115246772766113,
+      "word_nll_delta": -3.388755942523858e-11,
+      "expected_normalized_nll": 9.1152467728,
+      "actual_normalized_nll": 9.115246772766113,
+      "normalized_nll_delta": -3.388755942523858e-11
+    },
+    {
+      "sample_id": "morph-v1-003",
+      "target": "gelmedim",
+      "pass": true,
+      "expected_token_count": 2,
+      "actual_token_count": 2,
+      "expected_word_nll": 7.9363057613,
+      "actual_word_nll": 7.93630576133728,
+      "word_nll_delta": 3.7280400988493057e-11,
+      "expected_normalized_nll": 3.9681528807,
+      "actual_normalized_nll": 3.96815288066864,
+      "normalized_nll_delta": -3.135980364277202e-11
+    },
+    {
+      "sample_id": "morph-v1-004",
+      "target": "gelmedik",
+      "pass": true,
+      "expected_token_count": 2,
+      "actual_token_count": 2,
+      "expected_word_nll": 11.6550559998,
+      "actual_word_nll": 11.65505599975586,
+      "word_nll_delta": -4.4140691102256824e-11,
+      "expected_normalized_nll": 5.8275279999,
+      "actual_normalized_nll": 5.82752799987793,
+      "normalized_nll_delta": -2.2070345551128412e-11
+    }
+  ],
+  "statistics": {
+    "overall": {
+      "n": 40,
+      "word_nll_mean": 8.214675035700202,
+      "word_nll_median": 9.030364513397217,
+      "word_nll_sample_stdev": 4.05939368627056,
+      "word_nll_min": 1.8312289714813232,
+      "word_nll_max": 16.469409465789795,
+      "normalized_nll_mean": 6.970265500061214,
+      "normalized_nll_median": 6.027921080589294,
+      "token_count_mean": 1.225,
+      "affix_count_mean": 1.775
+    },
+    "by_pos": {
+      "NOUN": {
+        "n": 20,
+        "word_nll_mean": 9.654618164151907,
+        "word_nll_median": 9.906991958618164,
+        "word_nll_sample_stdev": 3.82520701234353,
+        "word_nll_min": 3.238821029663086,
+        "word_nll_max": 16.469409465789795,
+        "normalized_nll_mean": 8.676069317385554,
+        "normalized_nll_median": 9.309726238250732,
+        "token_count_mean": 1.15,
+        "affix_count_mean": 1.3
+      },
+      "VERB": {
+        "n": 20,
+        "word_nll_mean": 6.774731907248497,
+        "word_nll_median": 5.590913534164429,
+        "word_nll_sample_stdev": 3.850625330759358,
+        "word_nll_min": 1.8312289714813232,
+        "word_nll_max": 13.14043140411377,
+        "normalized_nll_mean": 5.264461682736874,
+        "normalized_nll_median": 5.256721019744873,
+        "token_count_mean": 1.3,
+        "affix_count_mean": 2.25
+      }
+    },
+    "by_affix_count": {
+      "1": {
+        "n": 17,
+        "word_nll_mean": 8.710576515863924,
+        "word_nll_median": 9.722687721252441,
+        "word_nll_sample_stdev": 4.14083314018922,
+        "word_nll_min": 2.39512300491333,
+        "word_nll_max": 14.222039222717285,
+        "normalized_nll_mean": 8.319856283857542,
+        "normalized_nll_median": 9.673970222473145,
+        "token_count_mean": 1.0588235294117647,
+        "affix_count_mean": 1
+      },
+      "2": {
+        "n": 15,
+        "word_nll_mean": 6.0937591354052225,
+        "word_nll_median": 5.225343704223633,
+        "word_nll_sample_stdev": 3.3404763366038326,
+        "word_nll_min": 1.8312289714813232,
+        "word_nll_max": 11.75251579284668,
+        "normalized_nll_mean": 5.636161134640376,
+        "normalized_nll_median": 4.694028258323669,
+        "token_count_mean": 1.1333333333333333,
+        "affix_count_mean": 2
+      },
+      "3": {
+        "n": 8,
+        "word_nll_mean": 11.13760170340538,
+        "word_nll_median": 11.334980726242065,
+        "word_nll_sample_stdev": 3.209330019192335,
+        "word_nll_min": 5.893728733062744,
+        "word_nll_max": 16.469409465789795,
+        "normalized_nll_mean": 6.603830769658089,
+        "normalized_nll_median": 6.027921080589294,
+        "token_count_mean": 1.75,
+        "affix_count_mean": 3
+      }
+    }
+  },
+  "validation": {
+    "exact_40_ids": true,
+    "alignment_ok_count": 40,
+    "v2_schema_valid_count": 40,
+    "sample_hash_match_count": 40,
+    "inputs_unchanged": true,
+    "csv_jsonl_equal": true,
+    "finite_valid_nll_count": 40
+  },
+  "duration_seconds": 18.361997500000143,
+  "output_sha256": {
+    "results.jsonl": "b6a275eb2461a7cc290c83cc6a979e87236c8a4807bfa240fc20864593ebf92f",
+    "results.csv": "fba723367e0ddbb93180a024e9be622ee8fbafa1493ed3e76cac4c5652c8b140"
+  },
+  "regression_tests": {
+    "status": "PASS",
+    "command": ".venv\\Scripts\\python.exe -B -m unittest discover -s tests -v",
+    "tests_run": 116,
+    "existing_tests": 106,
+    "new_tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "duration_seconds": 10.201,
+    "executed_before_inference": true,
+    "execution_note": "Normal Windows temporary-directory access was required; initial sandbox-only attempt failed on temporary-folder permissions.",
+    "test_source_sha256": "09364456246079e09bb4adc151f9be8984f95217a66b3f0d2e83a5bb2be2da08"
+  },
+  "post_run_verification": {
+    "verified_at_utc": "2026-11-24T13:55:00.706677+00:00",
+    "protected_file_count": 56,
+    "changed_protected_files": [],
+    "scope": "All pre-existing files under src, data, results, scripts, tests and docs (excluding __pycache__)",
+    "all_source_and_result_hashes_match": true,
+    "all_79_alternatives_preserved": true,
+    "dataset_release_gate_command": ".venv\\Scripts\\python.exe -B scripts/build_dataset.py --check --require-reviewed",
+    "dataset_release_gate_status": "PASS"
+  }
+}
