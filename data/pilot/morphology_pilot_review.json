@@ -4,81 +4,81 @@
     {
       "sample_id": "morph-v1-001",
       "sample_sha256": "620eb2f36c0c65fde87723a38507271a7cd5a74f3c9284ffd7471a1181ce04eb",
-      "status": "pending",
-      "reviewer": null,
-      "reviewed_at": null,
+      "status": "approved",
+      "reviewer": "Hilal Ay",
+      "reviewed_at": "2026-11-24T12:46:47.052361+00:00",
       "notes": ""
     },
     {
       "sample_id": "morph-v1-002",
       "sample_sha256": "df5143c77cf0545f63e64d6b9525f30ce766632aec7130428102b687e372b5a0",
-      "status": "pending",
-      "reviewer": null,
-      "reviewed_at": null,
+      "status": "approved",
+      "reviewer": "Hilal Ay",
+      "reviewed_at": "2026-11-24T12:46:47.052361+00:00",
       "notes": ""
     },
     {
       "sample_id": "morph-v1-003",
       "sample_sha256": "786252b977ecc46cc1419ebb7ebbd93796887f535216a7a4178e976d24cf0e56",
-      "status": "pending",
-      "reviewer": null,
-      "reviewed_at": null,
+      "status": "approved",
+      "reviewer": "Hilal Ay",
+      "reviewed_at": "2026-11-24T12:46:47.052361+00:00",
       "notes": ""
     },
     {
       "sample_id": "morph-v1-004",
       "sample_sha256": "9415b76e23ef90e4f3dead0b5d977f61b40b5de9cd4dd1c236c1799abb0a0907",
-      "status": "pending",
-      "reviewer": null,
-      "reviewed_at": null,
+      "status": "approved",
+      "reviewer": "Hilal Ay",
+      "reviewed_at": "2026-11-24T12:46:47.052361+00:00",
       "notes": ""
     },
     {
       "sample_id": "morph-v1-005",
       "sample_sha256": "5206e13c6a76466d3f9d5443a382151efaef54e50f03fb8eb89cbcaae3908f8c",
-      "status": "pending",
-      "reviewer": null,
-      "reviewed_at": null,
+      "status": "approved",
+      "reviewer": "Hilal Ay",
+      "reviewed_at": "2026-11-24T12:46:47.052361+00:00",
       "notes": ""
     },
     {
       "sample_id": "morph-v1-006",
       "sample_sha256": "8bc483e5054a66b22557827fd61f9e522f7946040648566ffb0e51f320cfe26f",
-      "status": "pending",
-      "reviewer": null,
-      "reviewed_at": null,
+      "status": "approved",
+      "reviewer": "Hilal Ay",
+      "reviewed_at": "2026-11-24T12:46:47.052361+00:00",
       "notes": ""
     },
     {
       "sample_id": "morph-v1-007",
       "sample_sha256": "fa147a867e4b2b44dee9a059131efc27d8be653255ec285551152dc0352221c8",
-      "status": "pending",
-      "reviewer": null,
-      "reviewed_at": null,
-      "notes": ""
+      "status": "approved",
+      "reviewer": "Hilal Ay",
+      "reviewed_at": "2026-11-24T12:46:47.052361+00:00",
+      "notes": "Kullanıcı incelemesinde onaylandı. git sözlük lemması ile gid yüzey biçimi arasındaki ünsüz değişimi belgelenmeli. Bu değişim ek olarak sayılmamalıdır. Lemma ve yüzey biçimi ayrı alanlarda korunmalıdır."
     },
     {
       "sample_id": "morph-v1-008",
       "sample_sha256": "20ed3f3e3d4ac6bca75bf8f4e42b02dacbbd26d7f510f284379ec7ad0ed51470",
-      "status": "pending",
-      "reviewer": null,
-      "reviewed_at": null,
+      "status": "approved",
+      "reviewer": "Hilal Ay",
+      "reviewed_at": "2026-11-24T12:46:47.052361+00:00",
       "notes": ""
     },
     {
       "sample_id": "morph-v1-009",
       "sample_sha256": "cc55dd0ee2a41cde1e306873211b7604152be21892e0cbba5246c5ad2097e50a",
-      "status": "pending",
-      "reviewer": null,
-      "reviewed_at": null,
+      "status": "approved",
+      "reviewer": "Hilal Ay",
+      "reviewed_at": "2026-11-24T12:46:47.052361+00:00",
       "notes": ""
     },
     {
       "sample_id": "morph-v1-010",
       "sample_sha256": "380f8210f9dddd112f39dde14d5b0aa110177a483a13fa81f868b1ae803fd1e7",
-      "status": "pending",
-      "reviewer": null,
-      "reviewed_at": null,
+      "status": "approved",
+      "reviewer": "Hilal Ay",
+      "reviewed_at": "2026-11-24T12:46:47.052361+00:00",
       "notes": ""
     },
     {

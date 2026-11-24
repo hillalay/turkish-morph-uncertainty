@@ -1,6 +1,16 @@
 # Morfoloji pilotu — insan inceleme listesi
 
-Durum: **40 taslak kayıt; insan tarafından onaylanan 0 kayıt.** Otomatik kontroller manuel doğrulama sayılmaz.
+Durum: **40 kayıt; 10 insan onaylı, 30 bekleyen.** Otomatik kontroller manuel doğrulama sayılmaz.
+
+İlk 10 kayıt (`morph-v1-001`–`morph-v1-010`), kullanıcının açık insan incelemesi beyanıyla **Hilal Ay** adına onaylandı. `morph-v1-011`–`morph-v1-040` kayıtları aynen korundu ve `pending` kaldı. Manifest güncellemesinin gerçek UTC zamanı: `2026-11-24T12:46:47.052361+00:00`.
+
+Onaydan önce ve sonra manifestteki 40 `sample_sha256` değeri canonical dataset üzerinden yeniden doğrulandı; bütün özetler korundu. Dataset, CSV, seed ve ham analiz dosyaları değiştirilmedi. En az 30 manuel onay kabul kriteri henüz karşılanmadı.
+
+**007 inceleme notu (aynen):**
+
+> Kullanıcı incelemesinde onaylandı. git sözlük lemması ile gid yüzey biçimi arasındaki ünsüz değişimi belgelenmeli. Bu değişim ek olarak sayılmamalıdır. Lemma ve yüzey biçimi ayrı alanlarda korunmalıdır.
+
+007 kaydında proje lemması `git`, ham analizde `dictionary_root="git"`, `dictionary_lemma="gitmek"`, `stem="gid"` ve `word="gidiyoruz"` ayrı alanlarda zaten korunuyor. `git` → `gid` ünsüz değişimi gövdeye aittir; ek sayılmaz. Seçili ekler `Prog1: iyor` ve `A1pl: uz`; `affix_count=2` aynı kaldı.
 
 Her satırda doğal/anlamsal bağlamı, seçilen lemma/POS ve özellikleri, ek yüzeylerini ve alternatif çözümlemeleri inceleyin. Tam alternatifler `data/pilot/morphology_pilot_analyses.jsonl` dosyasındadır. Seçim, seed dosyasında açıkça yazılan Zeyrek morfem yolu ile yapılmıştır; otomatik bağlamsal ayrıştırma yapılmamıştır.
 

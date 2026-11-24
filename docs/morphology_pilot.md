@@ -4,8 +4,10 @@ Branch: `feature/morphology-pilot`. Teknik doğrulama: 24 Kasım 2026.
 40 taslak kayıt, 10 lemma × 4 biçim; 20 fiil ve 20 isim örneği.
 23 kayıtta birden çok çözümleme, toplam 79 alternatif analiz korunur.
 Ek sayısı dağılımı: 17 kayıtta 1, 15 kayıtta 2, 8 kayıtta 3 ek.
-İnsan tarafından onaylanmış örnek sayısı **0**; bu teslim araştırma için
-onaylanmış gold dataset değildir. Güncel insan kararları review JSON dosyasındadır.
+İnsan tarafından onaylanmış örnek sayısı **10**, bekleyen **30**.
+`morph-v1-001`–`morph-v1-010` Hilal Ay tarafından açıkça onaylandı;
+011–040 kayıtları pending kaldı. Tüm dataset henüz insan onaylı gold veri değildir.
+Güncel insan kararları ve gerçek UTC güncelleme zamanı review JSON dosyasındadır.
 
 ## Kurulum
 
@@ -215,6 +217,6 @@ kelimeli hedefler reddedilir. Zeyrek sözlüğü tüm doğru Türkçe biçimleri
 dilbilimsel çözümlemeleri garanti etmez; bilinmeyen kelime için boş liste döner.
 Uzun/karmaşık türetim zincirleri pilot kapsamı ve testleri dışındadır. Açık
 seçim tarifleri insan bağlam kontrolünün yerini almaz. Bağlamlar isimler için
-doğal devrik söz dizimi kullanır ve henüz insan tarafından onaylanmamıştır.
+doğal devrik söz dizimi kullanır; 011–040 kayıtları henüz insan tarafından onaylanmamıştır.
 Bu 40 kayıt, karmaşıklığın bağımsız etkisini kanıtlayan dengeli bir araştırma
 tasarımı veya model karşılaştırması değildir.

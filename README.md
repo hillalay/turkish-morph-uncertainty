@@ -32,7 +32,7 @@ Python 3.13.5 üzerinde Zeyrek 0.1.3 / NLTK 3.9.2 ile doğrulandı:
 
 Yeni canonical veri `data/pilot/morphology_pilot_dataset.jsonl`, kayıpsız CSV teslimi
 `data/pilot/pilot_dataset.csv` dosyasıdır. **40 kayıt teknik kontrollerden geçti;
-insan incelemesi bekleyen taslaktır.** Mevcut beş örneklik `pilot_dataset.jsonl` ve
+10 kayıt insan onaylı, 30 kayıt insan incelemesi bekleyen taslaktır.** Mevcut beş örneklik `pilot_dataset.jsonl` ve
 Hilal'in inference hattı aynı kalır. JSON Schema dosyaları değiştirilmedi.
 
 [Kullanım, ek sayımı ve sınırlamalar](docs/morphology_pilot.md) ile
