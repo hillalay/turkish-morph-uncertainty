@@ -1,0 +1,696 @@
+{
+  "zeyrek_version": "0.1.3",
+  "nltk_version": "3.9.2",
+  "provenance": "Captured from real SingleAnalysis objects through the isolated adapter; not human review.",
+  "words": {
+    "geldim": [
+      {
+        "word": "geldim",
+        "dictionary_id": "gelmek_Verb",
+        "dictionary_lemma": "gelmek",
+        "dictionary_root": "gel",
+        "dictionary_pos": "VERB",
+        "pos": "VERB",
+        "stem": "gel",
+        "ending": "dim",
+        "morphemes": [
+          {
+            "id": "Verb",
+            "surface": "gel",
+            "derivational": false
+          },
+          {
+            "id": "Past",
+            "surface": "di",
+            "derivational": false
+          },
+          {
+            "id": "A1sg",
+            "surface": "m",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0
+        ]
+      }
+    ],
+    "gelmediler": [
+      {
+        "word": "gelmediler",
+        "dictionary_id": "gelmek_Verb",
+        "dictionary_lemma": "gelmek",
+        "dictionary_root": "gel",
+        "dictionary_pos": "VERB",
+        "pos": "VERB",
+        "stem": "gel",
+        "ending": "mediler",
+        "morphemes": [
+          {
+            "id": "Verb",
+            "surface": "gel",
+            "derivational": false
+          },
+          {
+            "id": "Neg",
+            "surface": "me",
+            "derivational": false
+          },
+          {
+            "id": "Past",
+            "surface": "di",
+            "derivational": false
+          },
+          {
+            "id": "A3pl",
+            "surface": "ler",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0
+        ]
+      }
+    ],
+    "gidiyorum": [
+      {
+        "word": "gidiyorum",
+        "dictionary_id": "gitmek_Verb",
+        "dictionary_lemma": "gitmek",
+        "dictionary_root": "git",
+        "dictionary_pos": "VERB",
+        "pos": "VERB",
+        "stem": "gid",
+        "ending": "iyorum",
+        "morphemes": [
+          {
+            "id": "Verb",
+            "surface": "gid",
+            "derivational": false
+          },
+          {
+            "id": "Prog1",
+            "surface": "iyor",
+            "derivational": false
+          },
+          {
+            "id": "A1sg",
+            "surface": "um",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0
+        ]
+      }
+    ],
+    "yazar": [
+      {
+        "word": "yazar",
+        "dictionary_id": "yazar_Adj",
+        "dictionary_lemma": "yazar",
+        "dictionary_root": "yazar",
+        "dictionary_pos": "ADJ",
+        "pos": "ADJ",
+        "stem": "yazar",
+        "ending": "",
+        "morphemes": [
+          {
+            "id": "Adj",
+            "surface": "yazar",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0
+        ]
+      },
+      {
+        "word": "yazar",
+        "dictionary_id": "yazar_Noun",
+        "dictionary_lemma": "yazar",
+        "dictionary_root": "yazar",
+        "dictionary_pos": "NOUN",
+        "pos": "NOUN",
+        "stem": "yazar",
+        "ending": "",
+        "morphemes": [
+          {
+            "id": "Noun",
+            "surface": "yazar",
+            "derivational": false
+          },
+          {
+            "id": "A3sg",
+            "surface": "",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0
+        ]
+      },
+      {
+        "word": "yazar",
+        "dictionary_id": "yazmak_Verb",
+        "dictionary_lemma": "yazmak",
+        "dictionary_root": "yaz",
+        "dictionary_pos": "VERB",
+        "pos": "ADJ",
+        "stem": "yaz",
+        "ending": "ar",
+        "morphemes": [
+          {
+            "id": "Verb",
+            "surface": "yaz",
+            "derivational": false
+          },
+          {
+            "id": "AorPart",
+            "surface": "ar",
+            "derivational": true
+          },
+          {
+            "id": "Adj",
+            "surface": "",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0,
+          1
+        ]
+      },
+      {
+        "word": "yazar",
+        "dictionary_id": "yazmak_Verb",
+        "dictionary_lemma": "yazmak",
+        "dictionary_root": "yaz",
+        "dictionary_pos": "VERB",
+        "pos": "VERB",
+        "stem": "yaz",
+        "ending": "ar",
+        "morphemes": [
+          {
+            "id": "Verb",
+            "surface": "yaz",
+            "derivational": false
+          },
+          {
+            "id": "Aor",
+            "surface": "ar",
+            "derivational": false
+          },
+          {
+            "id": "A3sg",
+            "surface": "",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0
+        ]
+      }
+    ],
+    "kitaba": [
+      {
+        "word": "kitaba",
+        "dictionary_id": "Kitab_Noun_Prop",
+        "dictionary_lemma": "Kitab",
+        "dictionary_root": "kitab",
+        "dictionary_pos": "NOUN",
+        "pos": "PROPN",
+        "stem": "kitab",
+        "ending": "a",
+        "morphemes": [
+          {
+            "id": "Noun",
+            "surface": "kitab",
+            "derivational": false
+          },
+          {
+            "id": "A3sg",
+            "surface": "",
+            "derivational": false
+          },
+          {
+            "id": "Dat",
+            "surface": "a",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0
+        ]
+      },
+      {
+        "word": "kitaba",
+        "dictionary_id": "kitap_Noun",
+        "dictionary_lemma": "kitap",
+        "dictionary_root": "kitap",
+        "dictionary_pos": "NOUN",
+        "pos": "NOUN",
+        "stem": "kitab",
+        "ending": "a",
+        "morphemes": [
+          {
+            "id": "Noun",
+            "surface": "kitab",
+            "derivational": false
+          },
+          {
+            "id": "A3sg",
+            "surface": "",
+            "derivational": false
+          },
+          {
+            "id": "Dat",
+            "surface": "a",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0
+        ]
+      }
+    ],
+    "evlerimizden": [
+      {
+        "word": "evlerimizden",
+        "dictionary_id": "ev_Noun",
+        "dictionary_lemma": "ev",
+        "dictionary_root": "ev",
+        "dictionary_pos": "NOUN",
+        "pos": "NOUN",
+        "stem": "ev",
+        "ending": "lerimizden",
+        "morphemes": [
+          {
+            "id": "Noun",
+            "surface": "ev",
+            "derivational": false
+          },
+          {
+            "id": "A3pl",
+            "surface": "ler",
+            "derivational": false
+          },
+          {
+            "id": "P1pl",
+            "surface": "imiz",
+            "derivational": false
+          },
+          {
+            "id": "Abl",
+            "surface": "den",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0
+        ]
+      }
+    ],
+    "evdeki": [
+      {
+        "word": "evdeki",
+        "dictionary_id": "ev_Noun",
+        "dictionary_lemma": "ev",
+        "dictionary_root": "ev",
+        "dictionary_pos": "NOUN",
+        "pos": "ADJ",
+        "stem": "ev",
+        "ending": "deki",
+        "morphemes": [
+          {
+            "id": "Noun",
+            "surface": "ev",
+            "derivational": false
+          },
+          {
+            "id": "A3sg",
+            "surface": "",
+            "derivational": false
+          },
+          {
+            "id": "Loc",
+            "surface": "de",
+            "derivational": false
+          },
+          {
+            "id": "Rel",
+            "surface": "ki",
+            "derivational": true
+          },
+          {
+            "id": "Adj",
+            "surface": "",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0,
+          3
+        ]
+      }
+    ],
+    "evdeydi": [
+      {
+        "word": "evdeydi",
+        "dictionary_id": "ev_Noun",
+        "dictionary_lemma": "ev",
+        "dictionary_root": "ev",
+        "dictionary_pos": "NOUN",
+        "pos": "VERB",
+        "stem": "ev",
+        "ending": "deydi",
+        "morphemes": [
+          {
+            "id": "Noun",
+            "surface": "ev",
+            "derivational": false
+          },
+          {
+            "id": "A3sg",
+            "surface": "",
+            "derivational": false
+          },
+          {
+            "id": "Loc",
+            "surface": "de",
+            "derivational": false
+          },
+          {
+            "id": "Zero",
+            "surface": "",
+            "derivational": true
+          },
+          {
+            "id": "Verb",
+            "surface": "",
+            "derivational": false
+          },
+          {
+            "id": "Past",
+            "surface": "ydi",
+            "derivational": false
+          },
+          {
+            "id": "A3sg",
+            "surface": "",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0,
+          3
+        ]
+      }
+    ],
+    "geliyorum": [
+      {
+        "word": "geliyorum",
+        "dictionary_id": "gelmek_Verb",
+        "dictionary_lemma": "gelmek",
+        "dictionary_root": "gel",
+        "dictionary_pos": "VERB",
+        "pos": "VERB",
+        "stem": "gel",
+        "ending": "iyorum",
+        "morphemes": [
+          {
+            "id": "Verb",
+            "surface": "gel",
+            "derivational": false
+          },
+          {
+            "id": "Prog1",
+            "surface": "iyor",
+            "derivational": false
+          },
+          {
+            "id": "A1sg",
+            "surface": "um",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0
+        ]
+      }
+    ],
+    "geldik": [
+      {
+        "word": "geldik",
+        "dictionary_id": "gelmek_Verb",
+        "dictionary_lemma": "gelmek",
+        "dictionary_root": "gel",
+        "dictionary_pos": "VERB",
+        "pos": "ADJ",
+        "stem": "gel",
+        "ending": "dik",
+        "morphemes": [
+          {
+            "id": "Verb",
+            "surface": "gel",
+            "derivational": false
+          },
+          {
+            "id": "PastPart",
+            "surface": "dik",
+            "derivational": true
+          },
+          {
+            "id": "Adj",
+            "surface": "",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0,
+          1
+        ]
+      },
+      {
+        "word": "geldik",
+        "dictionary_id": "gelmek_Verb",
+        "dictionary_lemma": "gelmek",
+        "dictionary_root": "gel",
+        "dictionary_pos": "VERB",
+        "pos": "NOUN",
+        "stem": "gel",
+        "ending": "dik",
+        "morphemes": [
+          {
+            "id": "Verb",
+            "surface": "gel",
+            "derivational": false
+          },
+          {
+            "id": "PastPart",
+            "surface": "dik",
+            "derivational": true
+          },
+          {
+            "id": "Noun",
+            "surface": "",
+            "derivational": false
+          },
+          {
+            "id": "A3sg",
+            "surface": "",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0,
+          1
+        ]
+      },
+      {
+        "word": "geldik",
+        "dictionary_id": "gelmek_Verb",
+        "dictionary_lemma": "gelmek",
+        "dictionary_root": "gel",
+        "dictionary_pos": "VERB",
+        "pos": "VERB",
+        "stem": "gel",
+        "ending": "dik",
+        "morphemes": [
+          {
+            "id": "Verb",
+            "surface": "gel",
+            "derivational": false
+          },
+          {
+            "id": "Past",
+            "surface": "di",
+            "derivational": false
+          },
+          {
+            "id": "A1pl",
+            "surface": "k",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0
+        ]
+      }
+    ],
+    "gelse": [
+      {
+        "word": "gelse",
+        "dictionary_id": "gelmek_Verb",
+        "dictionary_lemma": "gelmek",
+        "dictionary_root": "gel",
+        "dictionary_pos": "VERB",
+        "pos": "VERB",
+        "stem": "gel",
+        "ending": "se",
+        "morphemes": [
+          {
+            "id": "Verb",
+            "surface": "gel",
+            "derivational": false
+          },
+          {
+            "id": "Desr",
+            "surface": "se",
+            "derivational": false
+          },
+          {
+            "id": "A3sg",
+            "surface": "",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0
+        ]
+      }
+    ],
+    "gelmeliyim": [
+      {
+        "word": "gelmeliyim",
+        "dictionary_id": "gelmek_Verb",
+        "dictionary_lemma": "gelmek",
+        "dictionary_root": "gel",
+        "dictionary_pos": "VERB",
+        "pos": "VERB",
+        "stem": "gel",
+        "ending": "meliyim",
+        "morphemes": [
+          {
+            "id": "Verb",
+            "surface": "gel",
+            "derivational": false
+          },
+          {
+            "id": "Neces",
+            "surface": "meli",
+            "derivational": false
+          },
+          {
+            "id": "A1sg",
+            "surface": "yim",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0
+        ]
+      }
+    ],
+    "gelmişti": [
+      {
+        "word": "gelmişti",
+        "dictionary_id": "gelmek_Verb",
+        "dictionary_lemma": "gelmek",
+        "dictionary_root": "gel",
+        "dictionary_pos": "VERB",
+        "pos": "VERB",
+        "stem": "gel",
+        "ending": "mişti",
+        "morphemes": [
+          {
+            "id": "Verb",
+            "surface": "gel",
+            "derivational": false
+          },
+          {
+            "id": "Narr",
+            "surface": "miş",
+            "derivational": false
+          },
+          {
+            "id": "Past",
+            "surface": "ti",
+            "derivational": false
+          },
+          {
+            "id": "A3sg",
+            "surface": "",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0
+        ]
+      },
+      {
+        "word": "gelmişti",
+        "dictionary_id": "gelmek_Verb",
+        "dictionary_lemma": "gelmek",
+        "dictionary_root": "gel",
+        "dictionary_pos": "VERB",
+        "pos": "VERB",
+        "stem": "gel",
+        "ending": "mişti",
+        "morphemes": [
+          {
+            "id": "Verb",
+            "surface": "gel",
+            "derivational": false
+          },
+          {
+            "id": "NarrPart",
+            "surface": "miş",
+            "derivational": true
+          },
+          {
+            "id": "Adj",
+            "surface": "",
+            "derivational": false
+          },
+          {
+            "id": "Zero",
+            "surface": "",
+            "derivational": true
+          },
+          {
+            "id": "Verb",
+            "surface": "",
+            "derivational": false
+          },
+          {
+            "id": "Past",
+            "surface": "ti",
+            "derivational": false
+          },
+          {
+            "id": "A3sg",
+            "surface": "",
+            "derivational": false
+          }
+        ],
+        "group_boundaries": [
+          0,
+          1,
+          3
+        ]
+      }
+    ],
+    "zzzzq": []
+  }
+}
