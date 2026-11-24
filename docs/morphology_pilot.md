@@ -4,10 +4,11 @@ Branch: `feature/morphology-pilot`. Teknik doğrulama: 24 Kasım 2026.
 40 taslak kayıt, 10 lemma × 4 biçim; 20 fiil ve 20 isim örneği.
 23 kayıtta birden çok çözümleme, toplam 79 alternatif analiz korunur.
 Ek sayısı dağılımı: 17 kayıtta 1, 15 kayıtta 2, 8 kayıtta 3 ek.
-İnsan tarafından onaylanmış örnek sayısı **10**, bekleyen **30**.
-`morph-v1-001`–`morph-v1-010` Hilal Ay tarafından açıkça onaylandı;
-011–040 kayıtları pending kaldı. Tüm dataset henüz insan onaylı gold veri değildir.
+İnsan tarafından onaylanmış örnek sayısı **40**, bekleyen **0**.
+`morph-v1-001`–`morph-v1-040` Hilal Ay tarafından açıkça incelenip onaylandı.
+Onay bağlama uygun seçilmiş analize aittir; bütün alternatif analizler korunur.
 Güncel insan kararları ve gerçek UTC güncelleme zamanı review JSON dosyasındadır.
+Dataset içeriği ve kimliği korunmuştur; `morphology-pilot-v1-draft` sürüm etiketi değiştirilmemiştir.
 
 ## Kurulum
 
@@ -195,12 +196,21 @@ geçersizleşir; builder eski manifesti görürse çıktı yazmadan durur.
 ```
 
 Bu komut en az 30 kayıt ve mevcut kayıtların tamamında geçerli insan onayı
-ister. Şu an **beklenen biçimde başarısızdır**: `Human review pending`.
-İnsan incelemesi bitene kadar sprintin dataset kabul kriteri PARTIAL'dır.
+ister. 40 insan onayı manifeste işlendi; kontrol **PASS** sonucuyla doğrulandı.
+40/40 kayıt özeti eşleşti; insan incelemesi için dataset kabul kriteri karşılandı.
 
 ## Test sonuçları ve sınırlar
 
 Başlangıç: 78/78 mevcut test geçti. Teslim: 106/106 test (28 yeni), atlanan yok.
+
+Tam insan onaylarının manifeste uygulanması sonrası doğrulama
+(`2026-11-24T13:03:29.727726+00:00` tarihli metadata güncellemesi):
+
+- `scripts/build_dataset.py --check --require-reviewed`: **PASS**, 40/40 onay.
+- Manifest/dataset `sample_sha256`: **40/40 eşleşme**, bütün eski özetler korundu.
+- `python -B -m unittest discover -s tests -v`: **106/106 PASS**, 6,069 saniye; atlanan yok.
+- Dataset, CSV, seed ve ham analiz dosyaları ile ek sayımları değişmedi.
+- Bu güncelleme kullanıcı incelemesi için commit oluşturulmadan bırakıldı.
 Gerçek Zeyrek testleri için morphology extra gerekir; yoksa integration
 testleri açıkça skip olur, fixture tabanlı özellik testleri yine çalışır.
 Yeni CSV I/O testlerinin ilk sandbox koşusunda iki PermissionError görüldü;
@@ -217,6 +227,6 @@ kelimeli hedefler reddedilir. Zeyrek sözlüğü tüm doğru Türkçe biçimleri
 dilbilimsel çözümlemeleri garanti etmez; bilinmeyen kelime için boş liste döner.
 Uzun/karmaşık türetim zincirleri pilot kapsamı ve testleri dışındadır. Açık
 seçim tarifleri insan bağlam kontrolünün yerini almaz. Bağlamlar isimler için
-doğal devrik söz dizimi kullanır; 011–040 kayıtları henüz insan tarafından onaylanmamıştır.
+doğal devrik söz dizimi kullanır; bütün kayıtların seçilmiş analizleri Hilal Ay tarafından onaylanmıştır.
 Bu 40 kayıt, karmaşıklığın bağımsız etkisini kanıtlayan dengeli bir araştırma
 tasarımı veya model karşılaştırması değildir.

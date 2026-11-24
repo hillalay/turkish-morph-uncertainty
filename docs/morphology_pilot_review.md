@@ -1,10 +1,25 @@
 # Morfoloji pilotu — insan inceleme listesi
 
-Durum: **40 kayıt; 10 insan onaylı, 30 bekleyen.** Otomatik kontroller manuel doğrulama sayılmaz.
+Durum: **40 kayıt; 40 insan onaylı, 0 bekleyen.** Onaylar Hilal Ay tarafından açıkça bildirilen insan inceleme kararlarına dayanır; otomatik kontroller manuel doğrulama sayılmaz.
 
-İlk 10 kayıt (`morph-v1-001`–`morph-v1-010`), kullanıcının açık insan incelemesi beyanıyla **Hilal Ay** adına onaylandı. `morph-v1-011`–`morph-v1-040` kayıtları aynen korundu ve `pending` kaldı. Manifest güncellemesinin gerçek UTC zamanı: `2026-11-24T12:46:47.052361+00:00`.
+`morph-v1-001`–`morph-v1-040` kayıtlarının tamamı, kullanıcının açık insan incelemesi beyanıyla **Hilal Ay** adına onaylandı. Önceki geçici güncellememe kısıtları kullanıcı tarafından kaldırıldı. Bütün kayıtların manifest güncellemesinin gerçek UTC zamanı: `2026-11-24T13:03:29.727726+00:00`.
 
-Onaydan önce ve sonra manifestteki 40 `sample_sha256` değeri canonical dataset üzerinden yeniden doğrulandı; bütün özetler korundu. Dataset, CSV, seed ve ham analiz dosyaları değiştirilmedi. En az 30 manuel onay kabul kriteri henüz karşılanmadı.
+Onaydan önce ve sonra manifestteki 40 `sample_sha256` değeri canonical dataset üzerinden yeniden doğrulandı; bütün özetler korundu. Dataset, CSV, seed, ek sayımları ve ham analiz dosyaları değiştirilmedi. Toplam 79 alternatif analiz korunur. Onay yalnızca bağlama uygun seçilmiş analizin doğruluğunu ifade eder; diğer adayların silinmesine izin vermez. En az 30 manuel onay kabul kriteri karşılandı.
+
+Bütün kayıtların `notes` alanı alternatiflerin korunması ve mevcut ek sayımlarının değiştirilmemesi açıklamasını taşır. Önceki 007 notu aynen korundu; 015, 016, 025, 026–028, 033 ve 034–040 için özel inceleme açıklamaları ilgili manifest kayıtlarına işlendi.
+
+| Kayıt | Korunan teknik açıklama |
+|---|---|
+| 007 | `git → gid` ünsüz değişimi gövdeye aittir; ek sayılmaz. Lemma ve yüzey gövdesi ayrıdır. |
+| 015 | `oku → ok` ünlü düşmesi ek sayılmaz. `Prog1: uyor` ve `A1pl: uz` ayrımı korunur. |
+| 016 | `Fut: yacağ` gelecek zaman yüzeyi ve `A1pl: ız` kişi eki iki ayrı ek olarak korunur. |
+| 025 | Dört özel isim/cins isim ve Acc/iyelik alternatifi korunur. Bağlamda cins isim + Acc seçilidir; belirsizliğin bağlamla çözülmesine örnektir. |
+| 026–028 | Özel isim/cins isim alternatifleri korunur; bağlamdaki seçili analizler cins isimdir. |
+| 033 | `çocuk → çocuğ` ünsüz yumuşaması ek sayılmaz; Accusative ve possessive alternatifleri korunur. |
+| 034–036 | Sıfır türetimle isimleşmiş sıfat alternatifleri ham analizlerde korunur; seçili analiz cins isimdir. |
+| 037–040 | Sıfır türetim alternatifleri korunur; seçili analizler cins isimdir. |
+
+011–020 ek sayımları sırasıyla **2, 1, 2, 3, 2, 2, 2, 2, 3, 3** olarak korundu. Diğer kayıtların hâl özellikleri ve ek sayımları da değişmedi. `--require-reviewed` ve regresyon kontrollerinin sonuçları teknik dokümanda raporlanır.
 
 **007 inceleme notu (aynen):**
 
