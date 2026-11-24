@@ -1,7 +1,9 @@
 """Adapter for Zeyrek 0.1.3's structured SingleAnalysis objects."""
 
 from dataclasses import dataclass
+from functools import lru_cache
 from importlib.metadata import version
+from threading import RLock
 import unicodedata
 
 
@@ -11,6 +13,17 @@ POS = {
     "Interj": "INTJ", "Postp": "ADP", "Ques": "PART", "Punc": "PUNCT",
     "Dup": "X", "Unk": "X",
 }
+_BACKEND_LOCK = RLock()
+
+
+@lru_cache(maxsize=1)
+def _load_backend():
+    if version("zeyrek") != "0.1.3":
+        raise RuntimeError("This SingleAnalysis adapter requires zeyrek==0.1.3")
+    import zeyrek
+
+    # Zeyrek's graph uses module-level states; rebuilding it appends duplicate edges.
+    return zeyrek.MorphAnalyzer()
 
 
 @dataclass(frozen=True)
@@ -41,11 +54,8 @@ class Analysis:
 
 class TurkishMorphAnalyzer:
     def __init__(self):
-        if version("zeyrek") != "0.1.3":
-            raise RuntimeError("This SingleAnalysis adapter requires zeyrek==0.1.3")
-        import zeyrek
-
-        self._analyzer = zeyrek.MorphAnalyzer()
+        with _BACKEND_LOCK:
+            self._analyzer = _load_backend()
 
     def analyze(self, word: str) -> list[Analysis]:
         """Keep every analysis, including out-of-scope alternatives; unknown words return []."""
@@ -53,10 +63,26 @@ class TurkishMorphAnalyzer:
             raise ValueError("word must be one non-empty alphabetic word without whitespace")
         if word != unicodedata.normalize("NFC", word):
             raise ValueError("word must use Unicode NFC")
-        analyses = []
+        from zeyrek.attributes import calculate_phonetic_attributes
+        from zeyrek.morphology import _normalize
+
         # Public Parse drops suffix surfaces. _parse returns real (Morpheme, surface)
         # pairs and avoids sentence tokenization / an unrelated NLTK punkt download.
-        for raw in self._analyzer._parse(word):
+        with _BACKEND_LOCK:
+            # Upstream mutates cached sets and stem attrs during search. Isolate each
+            # word so geldik cannot remove later geliyorum analyses (PastPart ~k).
+            calculate_phonetic_attributes.cache_clear()
+            transitions = self._analyzer.analyzer.stem_transitions.prefix_matches(_normalize(word))
+            originals = [(transition, transition.attrs) for transition in transitions]
+            for transition, attrs in originals:
+                transition.attrs = attrs.copy()
+            try:
+                raw_analyses = self._analyzer._parse(word)
+            finally:
+                for transition, attrs in originals:
+                    transition.attrs = attrs
+        analyses = []
+        for raw in raw_analyses:
             pos = POS[raw.pos.value]
             if pos == "NOUN" and raw.dict_item.secondary_pos.value == "Prop":
                 pos = "PROPN"

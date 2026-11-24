@@ -40,7 +40,7 @@ def extract_features(analysis) -> dict:
             features["case"] = CASE[tag]
     if analysis.pos == "VERB":
         features["polarity"] = "negative" if "Neg" in tags else "positive"
-        if features["mood"] is None and features["tense"] is not None:
+        if features["mood"] is None and features["tense"] is not None and "Desr" not in tags:
             features["mood"] = "indicative"
     elif analysis.pos in {"NOUN", "PROPN", "PRON"} and features["case"] is None:
         # Zeyrek 0.1.3's parse_analysis explicitly omits the Nom and Pnon transitions.
